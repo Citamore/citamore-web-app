@@ -1,0 +1,32 @@
+/* business-dashboard.component.scss */
+@use './../../styles.scss';
+
+
+
+.sidenav-link {
+    @apply flex items-center py-1 px-3 rounded-md text-sm font-medium text-gray-700 transition duration-300 ease-in-out;
+  
+    /* Button-like hover and active states */
+    @apply hover:bg-gray-200 active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-neutral-400;
+  
+    /* To add active color when clicked */
+    &.active {
+      @apply bg-gray-100;
+    }
+  }
+  
+  /* Right border for the sidebar */
+  .border-r {
+    border-right: 1px solid #e5e7eb;
+  }
+  
+  /* Icon styles */
+  .material-icons-outlined {
+    font-size: 20px; /* Set icon size to 20px */
+    color: #4a5568; /* Set icon color */
+  }
+  
+  /* For the text next to the icon */
+  .sidenav-link span {
+    @apply text-sm;
+  }

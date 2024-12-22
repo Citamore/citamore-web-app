@@ -1,0 +1,101 @@
+/* Custom Navigation Buttons */
+.custom-nav {
+    width: 2rem;
+    height: 2rem;
+    background-color: black;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+  }
+  
+  .swiper-button-next::after,
+  .swiper-button-prev::after {
+    font-size: 1rem;
+    color: white;
+  }
+  
+  /* Pagination Overlay */
+  .swiper-pagination {
+    position: absolute;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    color: #cfcfcf;
+  }
+
+  /* Change Swiper Pagination Dot Color */
+ ::ng-deep .swiper-pagination-bullet {
+    background-color: #CFCFCF !important; /* Default inactive color */
+    opacity: 1; /* Ensure full visibility */
+  }
+  
+  ::ng-deep .swiper-pagination-bullet-active {
+    background-color: #717171 !important; /* Active dot color */
+  }
+  
+  
+/* Modal Container: Vertical Scrolling */
+.modal-container {
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  
+  /* Close Button */
+  button {
+    cursor: pointer;
+  }
+  
+  /* Image Styling */
+  .modal-container img {
+    display: block;
+    margin: 0 auto;
+  }
+  
+ /* Stepper */
+.stepper-step {
+  font-size: 1rem;
+  transition: color 0.3s, font-weight 0.3s;
+  text-transform: capitalize; /* Make first letter capital */
+  cursor: pointer; /* Ensure pointer cursor */
+}
+
+.stepper-step:hover {
+  color: black;
+}
+
+/* Layout Adjustments */
+@media (min-width: 768px) {
+  .stepper-step {
+    margin-left: 1rem; /* Add left margin for stepper on web */
+  }
+}
+
+@media (max-width: 767px) {
+  .stepper-step {
+    display: none; /* Hide stepper for mobile */
+  }
+
+  /* Center step label */
+  .text-lg.font-semibold {
+    text-align: center;
+    flex-grow: 1;
+  }
+}
+
+/* Cursor Pointer Everywhere */
+button, .stepper-step, .stepper-container span {
+  cursor: pointer; /* Adds pointer cursor globally */
+}
+
+
+.dot-separator {
+  font-size: 1.5rem; /* Increase size of the dot */
+  line-height: 1;    /* Align the dot vertically */
+  display: inline-block; /* Ensures proper spacing */
+  margin: 0 0.25rem; /* Space between the steps */
+  vertical-align: middle; /* Vertically center the dot */
+}

@@ -1,0 +1,716 @@
+<div class="max-w-screen-xl mx-auto px-4 py-8">
+    <!-- Small Screens: Images First -->
+    <div class="block md:hidden overflow-hidden">
+        <!-- Swiper Slider -->
+        <div class="swiper-container relative">
+            <div class="swiper-wrapper">
+                <div *ngFor="let img of images" class="swiper-slide relative">
+                    <img (click)="openModal()" [src]="img.url" [alt]="img.alt"
+                        class="w-full h-72 object-cover rounded-lg cursor-pointer">
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="swiper-pagination absolute bottom-4 left-1/2 transform -translate-x-1/2"></div>
+
+            <!-- Navigation Buttons -->
+            <button
+                class="swiper-button-prev custom-nav absolute top-1/2 left-4 transform -translate-y-1/2 bg-black bg-opacity-50 text-white rounded-full p-2">
+                <!-- <span class="material-symbols-outlined text-xl">chevron_left</span> -->
+            </button>
+            <button
+                class="swiper-button-next custom-nav absolute top-1/2 right-4 transform -translate-y-1/2 bg-black bg-opacity-50 text-white rounded-full p-2">
+                <!-- <span class="material-symbols-outlined text-xl">chevron_right</span> -->
+            </button>
+        </div>
+    </div>
+
+    <!-- Business Details: Small Screens -->
+    <div class="block md:hidden mt-6">
+        <div class="flex flex-col space-y-1">
+            <h1 class="text-3xl font-semibold text-gray-800">{{ businessName }}</h1>
+            <!-- Stars and Reviews in the First Row -->
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <span class="text-lg font-medium">{{ averageRating | number: '1.1-1' }}</span>
+                    <div class="flex">
+                        <span *ngFor="let star of getStars()" class="text-black">★</span>
+                    </div>
+                    <span class="text-blue-600 underline cursor-pointer">({{ totalReviews }})</span>
+                </div>
+
+                <!-- Direction Icon on the Right -->
+                <button class="bg-black text-white rounded-full w-8 h-8 flex items-center justify-center mr-6">
+                    <span class="material-symbols-outlined text-white text-lg">turn_right</span>
+                </button>
+            </div>
+
+            <!-- Status in the Second Row -->
+            <div>
+                <span [ngClass]="isOpen ? 'text-green-600' : 'text-red-600'" class="font-medium">{{ status }}</span>
+            </div>
+        </div>
+        <hr class="my-2">
+    </div>
+
+    <!-- Medium & Large Screen: Image Gallery -->
+    <div class="hidden md:block relative">
+        <!-- Single Featured Image -->
+        <div class="h-72">
+            <img (click)="openModal()" [src]="images[0].url" [alt]="images[0].alt"
+                class="rounded-lg w-full h-full object-cover cursor-pointer">
+        </div>
+
+        <!-- View More Button -->
+        <button (click)="openModal()"
+            class="absolute bottom-4 right-4 bg-black text-white rounded-lg px-4 py-2 text-sm font-medium hover:bg-gray-800 transition">
+            View More
+        </button>
+    </div>
+</div>
+
+<!-- Modal -->
+<div *ngIf="showModal" class="fixed inset-0 bg-black bg-opacity-70 z-50 flex justify-center items-center">
+    <!-- Scrollable Modal Container -->
+    <div class="bg-white p-4 rounded-lg max-h-screen overflow-y-auto w-full max-w-screen-md relative" #scrollableModal>
+        <!-- Close Button -->
+        <button (click)="closeModal()"
+            class="absolute top-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white rounded-full w-12 h-12 flex items-center justify-center z-50 mt-4">
+            <span class="material-symbols-outlined text-xl">close</span>
+        </button>
+
+        <!-- Vertically Scrollable Image List -->
+        <div class="flex flex-col space-y-4">
+            <div *ngFor="let img of images">
+                <img [src]="img.url" [alt]="img.alt" class="w-full h-auto object-cover rounded-lg">
+            </div>
+        </div>
+    </div>
+
+    <!-- Sticky Up Button -->
+    <button (click)="scrollToTop()" *ngIf="showUpButton"
+        class="fixed bottom-4 right-4 bg-gray-700 bg-opacity-70 text-white rounded-full w-10 h-10 flex items-center justify-center z-50">
+        <span class="material-symbols-outlined text-xl">keyboard_arrow_up</span>
+    </button>
+</div>
+
+<div class="max-w-screen-xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Left Section: Services -->
+    <div class="lg:col-span-2">
+        <h2 class="text-2xl font-bold mb-4">Services</h2>
+        <!-- Category Buttons -->
+        <div class="flex space-x-4 mb-4 top-0 bg-white z-20 py-2 shadow-sm overflow-x-auto no-scrollbar">
+            <button *ngFor="let category of categories" (click)="selectCategory(category)"
+                [ngClass]="{'bg-black text-white': selectedCategory.id === category.id, 'bg-gray-100': selectedCategory.id !== category.id}"
+                class="px-4 py-2 rounded-lg font-medium hover:bg-gray-300 transition">
+                {{ category.name }}
+            </button>
+        </div>
+
+        <!-- Services -->
+        <div class="space-y-4">
+            <div *ngFor="let service of visibleServices" (click)="toggleService(service)"
+                [ngClass]="{'border-purple-500': isSelected(service)}"
+                class="p-4 border rounded-lg shadow-sm flex justify-between items-center cursor-pointer hover:bg-gray-50 transition">
+                <div>
+                    <h3 class="text-lg font-semibold">{{ service.name }}</h3>
+                    <p class="text-sm text-gray-500">{{ service.duration }} mins</p>
+                    <p class="text-md font-medium mt-1">${{ service.price }}</p>
+                </div>
+                <span *ngIf="isSelected(service)" class="text-purple-600 material-symbols-outlined">check_circle</span>
+                <span *ngIf="!isSelected(service)" class="text-gray-400 material-symbols-outlined">add_circle</span>
+            </div>
+        </div>
+
+        <!-- Show More Button -->
+        <button (click)="openSericesModal()"
+            class="mt-4 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition">
+            Show More
+        </button>
+
+        <!-- Team Section -->
+        <div class="mt-8">
+            <h2 class="text-2xl font-bold mb-4">Team</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div *ngFor="let member of professionals" class="text-center">
+                    <img [src]="member.image" [alt]="member.name" class="w-24 h-24 rounded-full mx-auto mb-2">
+                    <h3 class="text-lg font-semibold">{{ member.name }}</h3>
+                    <p class="text-sm text-gray-500">{{ member.role }}</p>
+                    <p class="text-sm font-medium">{{ member.rating }} ★</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- About Section -->
+        <div class="mt-8">
+            <h2 class="text-2xl font-bold mb-4">About</h2>
+            <p class="text-gray-700">
+                {{ businessDescription }}
+            </p>
+        </div>
+
+        <!-- Reviews Section -->
+        <div class="mt-8">
+            <h2 class="text-2xl font-bold mb-4">Reviews</h2>
+            <div *ngIf="reviews && reviews.length > 0; else noReviews" class="space-y-4">
+                <div *ngFor="let review of reviews" class="p-4 border rounded-lg shadow-sm">
+                    <div class="flex items-center mb-2">
+                        <span
+                            class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold mr-2">
+                            {{ review.initials }}
+                        </span>
+                        <div>
+                            <h4 class="font-semibold">{{ review.name }}</h4>
+                            <p class="text-sm text-gray-500">{{ review.date }}</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-700">{{ review.comment }}</p>
+                </div>
+            </div>
+            <ng-template #noReviews>
+                <p class="text-gray-500">No reviews yet.</p>
+            </ng-template>
+        </div>        
+
+        <!-- Map Section -->
+        <div class="mt-8">
+            <h2 class="text-2xl font-bold mb-4">Location</h2>
+            <iframe [src]="mapUrl" class="w-full h-64 rounded-lg shadow-sm" frameborder="0" allowfullscreen>
+            </iframe>
+            <p class="mt-2 text-gray-500">
+                {{ businessAddress }}
+                <a [href]="getGoogleMapsUrl()" target="_blank" rel="noopener noreferrer" 
+                   class="text-blue-500 hover:underline">Get directions</a>
+            </p>
+        </div>
+
+        <!-- Opening Times -->
+        <div class="mt-8">
+            <h2 class="text-2xl font-bold mb-4">Opening Times</h2>
+            <ul class="space-y-2">
+                <li *ngFor="let day of openingHours" class="flex justify-between text-gray-700">
+                    <span class="font-medium">{{ day.name }}</span>
+                    <span [ngClass]="{'text-green-600': day.open, 'text-gray-400': !day.open}">
+                        {{ day.hours || 'Closed' }}
+                    </span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Right Section: Selected Services -->
+    <!-- Shared Wrapper -->
+    <div class="p-6 bg-white rounded-lg shadow-lg sticky top-4 h-fit md:block hidden" [class.hidden]="isMobileView">
+        <div class="flex items-center mb-4">
+            <img src="assets/images/biz_logo.jpg" alt="{{ businessName }} logo" class="w-16 h-16 rounded-full mr-4">
+            <h2 class="text-2xl font-bold">{{ businessName }}</h2>
+        </div>
+        <div class="flex items-center mb-2">
+            <span *ngIf="averageRating > 0" class="text-lg font-semibold mr-1">{{ averageRating }}</span>
+            <div *ngIf="averageRating > 0" class="flex">
+                <span *ngFor="let star of getStars()" class="text-black">★</span>
+            </div>
+            <span *ngIf="averageRating > 0" class="text-blue-600 ml-2 cursor-pointer">({{ totalReviews }})</span>
+            <span *ngIf="averageRating === 0" class="text-gray-500 ml-2">No reviews</span>
+        </div>        
+        <button (click)="openSericesModal()"
+            class="w-full bg-black text-white py-2 rounded-lg hover:bg-gray-800 transition mb-4">
+            Book now
+        </button>
+        <div [ngClass]="{'text-green-600': isOpen, 'text-gray-500': !isOpen}" class="font-medium flex items-center mb-2">
+            <span *ngIf="!isOpen" class="material-symbols-outlined mr-2" [ngClass]="{'text-green-600': isOpen, 'text-gray-500': !isOpen}">
+                public_off
+            </span>
+            <span *ngIf="isOpen" class="material-symbols-outlined mr-2" [ngClass]="{'text-green-600': isOpen, 'text-gray-500': !isOpen}">
+                public
+            </span>
+            <span>{{ statusMessage }}</span>
+        </div>        
+        <p class="flex flex-col mt-2 text-gray-500">
+            <span class="flex  mt-2">
+                <span class="material-symbols-outlined mr-2">location_on</span>
+                <span>{{ businessAddress }}</span>
+            </span>
+            <span class="flex  mt-2">
+                <span class="material-symbols-outlined mr-2">sync_alt</span> 
+                <span *ngIf="distance && duration"> 
+                  <span>Distance : {{ distance }} , Time : {{ duration }}</span>
+                </span>
+            </span>
+            <a [href]="getGoogleMapsUrl()" target="_blank" rel="noopener noreferrer" 
+               class="text-blue-500 hover:underline mt-2">Get directions</a>
+        </p>              
+    </div>
+
+    <!-- Mobile Layout -->
+    <div class="md:hidden fixed bottom-0 left-0 w-full bg-white shadow-md p-4 flex justify-between items-center z-50"
+        [class.hidden]="!isMobileView">
+        <div class="flex items-center">
+            <img src="assets/images/biz_logo.jpg" alt="{{ businessName }} logo" class="w-10 h-10 rounded-full mr-2">
+            <div>
+                <h2 class="text-sm font-bold">{{ businessName }}</h2>
+                <p class="text-gray-500 text-xs">{{ averageRating }} ★ ({{ totalReviews }} reviews)</p>
+            </div>
+        </div>
+        <button (click)="openSericesModal()"
+            class="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition">
+            Book Now
+        </button>
+    </div>
+
+</div>
+
+
+<!-- Modal -->
+<div *ngIf="showServicesModal" class="fixed inset-0 bg-white z-50 flex flex-col">
+    <!-- Top Bar with Left Arrow -->
+    <div class="p-4 flex items-center justify-between">
+        <!-- Left Section: Back Arrow and Stepper (Web Only) -->
+        <div class="flex items-center space-x-4">
+            <!-- Back Arrow -->
+            <button (click)="goBack()" class="flex items-center space-x-2 text-gray-600 hover:text-black">
+                <span class="material-symbols-outlined text-md">arrow_back</span>
+            </button>
+
+            <!-- Stepper (Web Only) -->
+            <div class="hidden md:flex space-x-2">
+                <ng-container *ngFor="let step of steps; let i = index">
+                    <span (click)="navigateToStep(i)" [ngClass]="{
+                  'text-black font-semibold': currentStepIndex === i, 
+                  'text-gray-400 cursor-pointer': i < currentStepIndex,
+                  'text-gray-300': i > currentStepIndex
+                }" class="stepper-step transition cursor-pointer">
+                        {{ step }}
+                    </span>
+                    <!-- Separator -->
+                    <span *ngIf="i < steps.length - 1" class="dot-separator text-gray-300">
+                        ·
+                    </span>
+                </ng-container>
+            </div>
+        </div>
+
+        <!-- Mobile Only: Step Label -->
+        <span class="md:hidden text-lg font-semibold">{{ getStepLabel(currentStep) }}</span>
+
+        <!-- Close Modal Icon -->
+        <button (click)="closeServicesModal()" class="text-gray-600 hover:text-black">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+    </div>
+
+    <div class="w-full mx-auto px-4 sm:px-10 md:px-12 py-4 md:py-8">
+        <!-- Category Buttons -->
+        <div *ngIf="currentStep === 'services'"
+            class="flex space-x-4 mb-4 sticky top-0 bg-white z-20 py-2 shadow-sm overflow-x-auto no-scrollbar">
+            <button *ngFor="let category of categories; let i = index" (click)="scrollToCategory(i)"
+                [ngClass]="{'bg-black text-white': currentCategoryIndex === i, 'bg-gray-200': currentCategoryIndex !== i}"
+                class="flex-shrink-0 px-4 py-2 rounded-lg font-medium transition hover:bg-gray-300">
+                {{ category.name }}
+            </button>
+        </div>
+
+
+        <!-- Scrollable Content -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Left Section: Services -->
+            <div *ngIf="currentStep === 'services'" #scrollContainer
+                class="md:col-span-2 space-y-8 overflow-y-auto max-h-[600px] relative">
+                <div *ngFor="let category of categories; let i = index" #categorySection>
+                    <!-- Sticky Category Header -->
+                    <h2
+                        class="text-2xl font-bold text-gray-800 bg-white sticky top-0 py-2 z-10 transition-all duration-300">
+                        {{ category.name }}
+                    </h2>
+
+                    <!-- Services -->
+                    <div *ngIf="(groupedServices[category.id] || []).length > 0; else noServices">
+                        <div *ngFor="let service of groupedServices[category.id] || []" (click)="toggleService(service)"
+                             [ngClass]="{'border-purple-500': isSelected(service)}"
+                             class="p-4 my-4 border rounded-lg shadow-sm flex justify-between items-center cursor-pointer hover:bg-gray-50 transition">
+                          <div>
+                            <h3 class="text-lg font-semibold">{{ service.name }}</h3>
+                            <p class="text-sm text-gray-500">{{ service.duration }} mins</p>
+                            <p class="text-md font-medium mt-1">${{ service.price }}</p>
+                          </div>
+                          <span *ngIf="isSelected(service)" class="text-purple-600 material-symbols-outlined">check_circle</span>
+                          <span *ngIf="!isSelected(service)" class="text-gray-400 material-symbols-outlined">add_circle</span>
+                        </div>
+                      </div>
+                      
+
+                    <!-- No Services Template -->
+                    <ng-template #noServices>
+                        <p class="text-gray-500 italic">No services available under this category.</p>
+                    </ng-template>
+                </div>
+            </div>
+
+            <div *ngIf="currentStep === 'professional'"
+                class="md:col-span-2 space-y-8 overflow-y-auto max-h-[600px] relative">
+                <h2 class="col-span-full text-2xl font-bold mb-4">Select Professional</h2>
+
+                <!-- Professional Cards -->
+                <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                    <div *ngFor="let pro of professionals" (click)="selectProfessional(pro)"
+                        [ngClass]="{'border-purple-500': selectedProfessional?.id === pro.id}"
+                        class="p-4 border rounded-lg shadow-sm flex flex-col items-center justify-center text-center cursor-pointer hover:bg-gray-50 transition">
+
+                        <!-- Placeholder Image or Dynamic Image -->
+                        <div class="w-16 h-16 bg-gray-200 rounded-full mb-2 overflow-hidden">
+                            <img *ngIf="pro.image" [src]="pro.image" [alt]="pro.name"
+                                class="w-full h-full object-cover">
+                            <span *ngIf="!pro.image" class="material-symbols-outlined text-gray-500">person</span>
+                        </div>
+
+                        <h3 class="text-lg font-semibold">{{ pro.name }}</h3>
+                        <p class="text-sm text-gray-500">{{ pro.role }}</p>
+                        <div *ngIf="pro.rating > 0" class="text-yellow-400 text-sm font-medium">{{ pro.rating }} ★</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Select Time -->
+            <div *ngIf="currentStep === 'time'" class="md:col-span-2 space-y-8 overflow-y-auto max-h-[600px] relative">
+                <!-- Professional Info -->
+                <div class="flex items-center space-x-2 mb-6">
+                    <img [src]="selectedProfessional?.image" alt="{{ selectedProfessional?.name }}"
+                        class="w-10 h-10 rounded-full object-cover">
+                    <span class="font-semibold text-lg">{{ selectedProfessional?.name }}</span>
+                </div>
+
+                <!-- Date Selection Header -->
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold">{{ currentMonthYear }}</h2>
+                    <div class="flex space-x-4">
+                        <button (click)="navigateDates('prev')" [disabled]="isPrevDisabled()"
+                            [ngClass]="{'text-gray-200': isPrevDisabled(), 'text-gray-600 hover:bg-gray-100': !isPrevDisabled()}"
+                            class="p-2 rounded-full transition duration-300">
+                            <span class="material-symbols-outlined">chevron_left</span>
+                        </button>
+                        <button (click)="navigateDates('next')"
+                            class="text-gray-600 hover:bg-gray-100 p-2 rounded-full">
+                            <span class="material-symbols-outlined">chevron_right</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Date Picker -->
+                <div class="flex space-x-4 overflow-x-auto mb-6">
+                    <button *ngFor="let date of visibleDates; let i = index" (click)="selectDate(i)"
+                        [disabled]="!isDateAvailable(date)" [ngClass]="{
+                            'bg-purple-600 text-white': selectedDateIndex === i,
+                            'bg-gray-200': selectedDateIndex !== i,
+                            'text-gray-400': !isDateAvailable(date),
+                            'w-16 h-16 text-sm': true,
+                            'w-14 h-14': isMobileView
+                          }" class="px-4 py-2 rounded-lg font-medium whitespace-nowrap transition">
+                        <div>{{ date.getDate() }}</div>
+                        <div class="text-sm">{{ date.toLocaleDateString('en-US', { weekday: 'short' }) }}</div>
+                    </button>
+                </div>
+
+                <!-- Available Slots -->
+                <div *ngIf="availableSlots.length > 0; else fullyBooked">
+                    <div class="grid grid-cols-2 gap-4">
+                      <div *ngFor="let slot of availableSlots"
+                           class="p-4 border rounded-lg shadow-sm cursor-pointer hover:bg-gray-50"
+                           [ngClass]="{'border-purple-500': selectedSlot === slot}" 
+                           (click)="selectSlot(slot)">
+                        {{ slot }}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Fully Booked Template -->
+                  <ng-template #fullyBooked>
+                    <div class="p-6 bg-gray-50 rounded-lg text-center">
+                      <img [src]="selectedProfessional?.image" alt="{{ selectedProfessional?.name }}"
+                           class="w-14 h-14 mx-auto mb-2 rounded-full">
+                      <p class="text-lg font-semibold mb-2">{{ selectedProfessional?.name }} is fully booked on this date</p>
+                      <!-- <p class="text-gray-500 mb-4">Available from {{ nextAvailableDate }}</p> -->
+                      <div class="flex justify-center space-x-4">
+                        <button (click)="goToNextAvailableDate()"
+                                class="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition">
+                          Go to next available date
+                        </button>
+                        <button class="px-4 py-2 border rounded-lg hover:bg-gray-100">Join the waitlist</button>
+                      </div>
+                    </div>
+                  </ng-template>
+                  
+            </div>
+
+
+            <!-- Final Step: Review and Confirm -->
+            <div *ngIf="currentStep === 'review'"
+                class="hidden md:col-span-2 space-y-8 overflow-y-auto max-h-[600px] relative md:block">
+                <!-- Section Title -->
+                <h2 class="text-2xl font-bold mb-4">Review and Confirm</h2>
+
+                <!-- Payment Method -->
+                <div>
+                    <h3 class="font-semibold mb-2">Payment method</h3>
+                    <button
+                        class="w-full p-4 border rounded-lg flex items-center justify-between hover:bg-gray-100 transition">
+                        <span class="font-medium">Pay at venue</span>
+                        <span class="material-symbols-outlined">check_circle</span>
+                    </button>
+                </div>
+
+                <!-- Important Information -->
+                <div>
+                    <h3 class="font-semibold mb-2">Important info</h3>
+                    <p class="text-gray-500 text-sm">
+                        If you are unable to make this appointment, please cancel with at least 24 hours notice. If the
+                        appointment is canceled late, 50% of your service fee will be added to the next booking.
+                    </p>
+                </div>
+
+                <!-- Booking Notes -->
+                <div>
+                    <h3 class="font-semibold mb-2">Booking notes</h3>
+                    <textarea placeholder="Include comments or requests about your booking"
+                        class="w-full border rounded-lg p-2"></textarea>
+                </div>
+            </div>
+
+            <!-- Right Section: Selected Services -->
+            <div *ngIf="currentStep != 'review'" class="hidden md:block p-6 bg-white rounded-lg shadow-lg h-fit">
+                <div class="flex items-center mb-4">
+                    <img src="assets/images/biz_logo.jpg" alt="{{ businessName }} logo"
+                        class="w-16 h-16 rounded-full mr-4">
+                    <h2 class="text-xl font-bold">{{ businessName }}</h2>
+                </div>
+                <h2 class="text-xl font-bold mb-4">Selected Services</h2>
+                <div *ngIf="selectedServices.length; else emptyState" class="space-y-2">
+                    <div *ngIf="selectedDate && selectedSlot" class="text-gray-700 mb-4">
+                        <!-- Selected Date and Slot Information -->
+                        <span class="block font-semibold">{{ formatSelectedDate(selectedDate) }}</span>
+                        <span class="text-gray-400 text-sm">
+                            {{ selectedSlot }} - {{ calculateEndTime(selectedSlot) }} ({{ calculateTotalDuration() }}
+                            mins)
+                        </span>
+                    </div>
+                    <div *ngFor="let service of selectedServices" class="flex justify-between text-gray-700">
+                        <div>
+                            <span class="block font-semibold">{{ service.name }}</span>
+                            <span class="text-gray-400 text-sm">
+                                {{ service.duration }} mins
+                                <span *ngIf="selectedProfessional">with {{ selectedProfessional.name }}</span>
+                            </span>
+                        </div>
+                        <span>${{ service.price }}</span>
+                    </div>
+                    <hr class="my-2">
+                    <div class="flex justify-between font-semibold text-lg">
+                        <span>Total</span>
+                        <span>${{ calculateTotal() }}</span>
+                    </div>
+                </div>
+                <ng-template #emptyState>
+                    <p class="text-gray-500">No services selected</p>
+                </ng-template>
+                <button (click)="proceedToNextStep()"
+                    class="w-full mt-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition">
+                    Continue
+                </button>
+            </div>
+
+            <!-- Right Panel: Summary -->
+            <div *ngIf="currentStep === 'review'" class="p-6 bg-white rounded-lg shadow-lg h-fit hidden md:block">
+                <h2 class="text-xl font-bold mb-4">Booking Summary</h2>
+                <div class="flex items-center mb-4">
+                    <img src="assets/images/biz_logo.jpg" alt="{{ businessName }} logo"
+                        class="w-16 h-16 rounded-full mr-4">
+                    <h2 class="text-xl font-bold">{{ businessName }}</h2>
+                </div>
+                <!-- Date and Time -->
+                <div class="text-gray-700 mb-4">
+                    <span class="block font-semibold">{{ formatSelectedDate(selectedDate) }}</span>
+                    <span *ngIf="selectedSlot">
+                        {{ selectedSlot }} - {{ calculateEndTime(selectedSlot) }} ({{ calculateTotalDuration() }} mins)
+                    </span>
+                </div>
+
+                <!-- Services -->
+                <div *ngFor="let service of selectedServices" class="flex justify-between text-gray-700 mb-2">
+                    <div>
+                        <span class="block font-semibold">{{ service.name }}</span>
+                        <span class="text-gray-400 text-sm">{{ service.duration }} mins</span>
+                    </div>
+                    <span>${{ service.price }}</span>
+                </div>
+
+                <!-- Coupon Code -->
+                <div class="mb-4">
+                    <input type="text" placeholder="Enter coupon code" class="w-full p-2 border rounded-lg">
+                </div>
+
+                <hr class="my-2">
+
+                <!-- Tax and Total -->
+                <div class="flex justify-between text-gray-500 mb-2">
+                    <span>Tax</span>
+                    <span>${{ (calculateTotal() * 0.13).toFixed(2) }}</span> <!-- 13% Tax -->
+                </div>
+                <div class="flex justify-between text-lg font-semibold">
+                    <span>Total</span>
+                    <span>${{ (calculateTotal() * 1.13).toFixed(2) }}</span>
+                </div>
+
+                <!-- Payment Info -->
+                <div class="mt-4 text-sm text-gray-600">
+                    <p><span class="text-green-600 font-medium">Pay now</span>: $0</p>
+                    <p><span class="font-medium">Pay at venue</span>: ${{ (calculateTotal() * 1.13).toFixed(2) }}</p>
+                </div>
+
+                <!-- Confirm Button -->
+                <button (click)="confirmBooking()"
+                    class="w-full mt-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition">
+                    Confirm
+                </button>
+            </div>
+
+            <!-- mobile-only -->
+            <div class="bg-white rounded-lg h-fit p-2 md:hidden overflow-y-auto max-h-[80vh]"
+                *ngIf="currentStep === 'review'">
+                <h2 class="text-xl font-bold mb-4">Booking Summary</h2>
+
+                <!-- Date and Time -->
+                <div class="text-gray-700 mb-4">
+                    <div class="flex items-center mb-4">
+                        <img src="assets/images/biz_logo.jpg" alt="{{ businessName }} logo"
+                            class="w-14 h-14 rounded-full mr-4">
+                        <h2 class="text-xl font-bold">{{ businessName }}</h2>
+                    </div>
+                    <!-- Date -->
+                    <div class="flex items-center mb-2">
+                        <span class="material-symbols-outlined text-gray-500 mr-2">calendar_today</span>
+                        <span class="block font-semibold">{{ formatSelectedDate(selectedDate) }}</span>
+                    </div>
+
+                    <!-- Time Slot -->
+                    <div *ngIf="selectedSlot" class="flex items-center">
+                        <span class="material-symbols-outlined text-gray-500 mr-2">schedule</span>
+                        <span>
+                            {{ selectedSlot }} - {{ calculateEndTime(selectedSlot) }} ({{ calculateTotalDuration() }}
+                            mins)
+                        </span>
+                    </div>
+                </div>
+
+                <hr class="my-2">
+
+                <!-- Services -->
+                <div *ngFor="let service of selectedServices" class="flex justify-between text-gray-700 mb-2">
+                    <div>
+                        <span class="block font-semibold">{{ service.name }}</span>
+                        <span class="text-gray-400 text-sm">{{ service.duration }} mins</span>
+                    </div>
+                    <span>${{ service.price }}</span>
+                </div>
+
+                <!-- Coupon Code -->
+                <div class="mb-4">
+                    <input type="text" placeholder="Enter coupon code" class="w-full p-2 border rounded-lg">
+                </div>
+
+                <hr class="my-2">
+
+                <!-- Tax and Total -->
+                <div class="flex justify-between text-gray-500 mb-2">
+                    <span>Tax</span>
+                    <span>${{ (calculateTotal() * 0.13).toFixed(2) }}</span>
+                </div>
+                <div class="flex justify-between text-lg font-semibold">
+                    <span>Total</span>
+                    <span>${{ (calculateTotal() * 1.13).toFixed(2) }}</span>
+                </div>
+
+                <!-- Payment Info -->
+                <div class="mt-4 text-sm text-gray-600">
+                    <div class="flex justify-between">
+                        <span class="text-green-600 font-medium">Pay now</span>
+                        <span>$0</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="font-medium">Pay at venue</span>
+                        <span>${{ (calculateTotal() * 1.13).toFixed(2) }}</span>
+                    </div>
+                </div>
+
+                <!-- Payment Method -->
+                <div class="mt-4">
+                    <h3 class="font-semibold mb-2">Payment method</h3>
+                    <button
+                        class="w-full p-4 border rounded-lg flex items-center justify-between hover:bg-gray-100 transition">
+                        <span class="font-medium">Pay at venue</span>
+                        <span class="material-symbols-outlined">check_circle</span>
+                    </button>
+                </div>
+
+                <!-- Important Information -->
+                <div class="mt-4">
+                    <h3 class="font-semibold mb-2">Important info</h3>
+                    <p class="text-gray-500 text-sm">
+                        If you are unable to make this appointment, please cancel with at least 24 hours notice. If the
+                        appointment is canceled late, 50% of your service fee will be added to the next booking.
+                    </p>
+                </div>
+
+                <!-- Booking Notes -->
+                <div class="mt-4">
+                    <h3 class="font-semibold mb-2">Booking notes</h3>
+                    <textarea placeholder="Include comments or requests about your booking"
+                        class="w-full border rounded-lg p-2"></textarea>
+                </div>
+            </div>
+
+
+            <!-- Fixed Mobile Bottom Bar -->
+            <div *ngIf="currentStep === 'review'"
+                class="md:hidden fixed bottom-0 left-0 w-full bg-white shadow-md p-4 flex justify-between items-center z-50">
+                <div class="text-gray-600 text-sm">
+                    <span>{{ selectedServices.length }} Services</span>
+                    <span class="ml-2">| Total: ${{ (calculateTotal() * 1.13).toFixed(2) }}</span>
+                </div>
+                <button (click)="confirmBooking()"
+                    class="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition">
+                    Confirm
+                </button>
+            </div>
+
+
+            <!-- Fixed Bottom Bar for Mobile -->
+            <div *ngIf="currentStep != 'review' && shouldShowBottomBar()"
+                class="md:hidden fixed bottom-0 left-0 w-full bg-white shadow-md p-4 flex justify-between items-center z-50">
+                <!-- Left: Number of Services and Total -->
+                <div class="text-gray-600 font-sm">
+                    <span>{{ selectedServices.length }} Services</span>
+                    <span class="ml-2">| Total: ${{ calculateTotal() }}</span>
+                </div>
+
+                <!-- Right: Continue Button -->
+                <button (click)="proceedToNextStep()"
+                    class="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition">
+                    Continue
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div *ngIf="showExitConfirmation"
+        class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
+        <div class="bg-white rounded-lg p-6 w-80 text-center">
+            <p class="font-semibold text-lg mb-4">Are you sure you want to leave this booking?</p>
+            <p class="text-gray-500 mb-4">All selections will be lost</p>
+            <div class="flex justify-between space-x-4">
+                <button (click)="closeModal()" class="w-full py-2 border rounded-lg hover:bg-gray-100">Cancel</button>
+                <button (click)="confirmCloseModal()"
+                    class="w-full py-2 bg-black text-white rounded-lg hover:bg-gray-800">Yes, exit</button>
+            </div>
+        </div>
+    </div>
+</div>

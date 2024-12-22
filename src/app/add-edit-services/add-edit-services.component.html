@@ -1,0 +1,195 @@
+<form [formGroup]="serviceForm">
+  <div *ngIf="isModalOpen && selectedType!='category'" class="modal-overlay">
+    <div class="modal-content">
+      <h3 class="text-lg font-semibold">Add {{selectedType}}</h3>
+
+      <!-- Image and Input Section -->
+      <div class="flex items-center space-x-4">
+        <!-- Image Upload Section (Left) -->
+        <div class="flex items-center justify-center w-1/2">
+          <label for="image-upload" class="flex flex-col items-center justify-center cursor-pointer w-40 h-40 border-4 border-dashed border-gray-300 rounded-full bg-gray-50 hover:bg-gray-100">
+            <input id="image-upload" type="file" class="hidden" (change)="onImageSelected($event)" />
+            <div class="flex flex-col items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+              </svg>
+              <span class="text-sm text-gray-500">Service Image</span>
+            </div>
+          </label>
+        </div>
+        
+        <!-- Service Name Input Section (Right) -->
+        <div class="flex flex-col w-1/2">
+          <label for="title" class="block text-sm font-semibold text-gray-700">Name</label>
+          <input id="title" formControlName="title" class="w-full mt-2 p-2 border rounded-md h-12"
+                 [ngClass]="{'border-red-500': serviceForm.get('title')?.touched && serviceForm.get('title')?.invalid}" 
+                 type="text" placeholder="Service Title" />
+        </div>
+      </div>
+
+      <!-- Service Cost and Duration Sections -->
+      <div class="flex items-center space-x-4 mt-4">
+        <!-- Service Cost -->
+        <div class="relative w-1/2">
+          <label for="cost" class="block text-sm font-medium">Cost</label>
+          <div class="w-full flex mt-2 items-center rounded-md bg-white pl-3 outline outline-1 -outline-offset-1 outline-gray-200">
+            <div class="shrink-0 select-none text-base text-gray-500 sm:text-sm/6">$</div>
+            <input id="cost" formControlName="cost" class="w-full p-2 rounded-md text-gray-900 placeholder:text-gray-400 h-12"
+                   [ngClass]="{'border-red-500': serviceForm.get('cost')?.touched && serviceForm.get('cost')?.invalid}" 
+                   placeholder="0.00" />
+          </div>
+        </div>
+
+        <!-- Duration -->
+        <div class="relative w-1/2">
+          <label for="duration" class="block text-sm font-medium">Duration (mins)</label>
+          <input id="duration" formControlName="duration" class="w-full mt-2 p-2 border rounded-md h-12"
+                 [ngClass]="{'border-red-500': serviceForm.get('duration')?.touched && serviceForm.get('duration')?.invalid}"
+                 placeholder="Duration" />
+        </div>
+      </div>
+
+      <!-- Buffer and Category Sections -->
+      <div class="flex items-center space-x-4 mt-4">
+        <!-- Buffer Input -->
+        <div *ngIf="selectedType == 'class'" class="relative w-1/2">
+          <label for="buffer" class="block text-sm font-medium">Seats</label>
+          <input id="seats" formControlName="seats" class="w-full mt-2 p-2 border rounded-md h-12"
+                 [ngClass]="{'border-red-500': serviceForm.get('seats')?.touched && serviceForm.get('seats')?.invalid}" 
+                 type="text" placeholder="Seats" />
+        </div>
+
+        <div *ngIf="selectedType == 'service'" class="relative w-1/2">
+          <label for="seats" class="block text-sm font-medium">Buffer</label>
+          <input id="buffer" formControlName="buffer" class="w-full mt-2 p-2 border rounded-md h-12"
+                 [ngClass]="{'border-red-500': serviceForm.get('buffer')?.touched && serviceForm.get('buffer')?.invalid}" 
+                 type="text" placeholder="Buffer" />
+        </div>
+
+        <!-- Category Dropdown -->
+        <div class="relative w-1/2">
+          <label for="category" class="block text-sm font-medium">Select Category</label>
+          <button 
+            class="w-full px-4 mt-2 py-2 text-sm text-gray-700 bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center h-12"
+            [ngClass]="{'border-red-500': serviceForm.get('category')?.touched && serviceForm.get('category')?.invalid}"
+            (click)="toggleDropdown()">
+            <span class="text-gray-400">{{ selectedOption || 'Select Category' }}</span>
+            <span class="material-icons-outlined ml-2 text-gray-400">expand_more</span>
+          </button>
+          <div *ngIf="dropdownOpen" class="absolute left-0 w-full mt-1 bg-white shadow-lg border border-gray-300 rounded-md z-10">
+            <a 
+              *ngFor="let category of categories" 
+              class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" 
+              (click)="selectOption(category.name)">
+              {{ category.name }}
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Staff and Location Sections -->
+      <div class="flex items-center space-x-4 mt-4">
+        <!-- Staff Section -->
+        <div class="relative w-1/2">
+          <label for="staff" class="block text-sm font-medium">Select Staff</label>
+          <button 
+            class="w-full px-4 mt-2 py-2 text-sm text-gray-700 bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center h-12"
+            [ngClass]="{'border-red-500': selectedStaff.length === 0 && serviceForm.get('staff')?.touched}"
+            (click)="toggleStaffDropdown()">
+            <span [ngClass]="{'text-black': selectedStaff.length > 0, 'text-gray-400': selectedStaff.length === 0}">
+              {{ selectedStaff.length > 0 ? selectedStaff.join(', ') : 'Select Staff' }}
+            </span>
+            <span class="material-icons-outlined ml-2 text-gray-400">expand_more</span>
+          </button>
+
+          <div *ngIf="dropdownStaffOpen" class="absolute left-0 w-full mt-1 bg-white shadow-lg border border-gray-300 rounded-md z-10">
+            <div *ngFor="let staff of staffs" class="p-2 flex items-center mb-2">
+              <input 
+                type="checkbox" 
+                [checked]="serviceForm.get('staff')?.value.includes(staff.id)" 
+                (change)="selectStaff(staff.id, $event)" 
+                class="mr-2 text-blue-500" />
+              <img [src]="staff.imageUrl" alt="{{ staff.name }}" class="ml-2 w-10 h-10 object-cover rounded-full border-2 border-white">
+              <label class="ml-2">{{ staff.name }}</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Location Section -->
+        <div class="relative w-1/2">
+          <label for="location" class="block text-sm font-medium">Select Location </label>
+          <button 
+            class="w-full px-4 mt-2 py-2 text-sm text-gray-700 bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 flex justify-between items-center h-12"
+            [ngClass]="{'border-red-500': selectedLocation.length === 0 && serviceForm.get('location')?.touched}"
+            (click)="toggleLocationsDropdown()">
+            <span [ngClass]="{'text-black': selectedLocation.length > 0, 'text-gray-400': selectedLocation.length === 0}">
+              {{ selectedLocation.length > 0 ? selectedLocation.join(', ') : 'Select Location' }}
+            </span>
+            <span class="material-icons-outlined ml-2 text-gray-400">expand_more</span>
+          </button>
+          <div *ngIf="dropdownLocationOpen" class="absolute left-0 w-full mt-1 bg-white shadow-lg border border-gray-300 rounded-md z-10">
+            <div *ngFor="let location of locations" class="p-2 flex items-center mb-2">
+              <input 
+                type="checkbox" 
+                [checked]="serviceForm.get('location')?.value.includes(location.id)"  
+                (change)="selectLocation(location.id, $event)"  
+                class="mr-2 text-blue-500" />
+              <label class="ml-2">{{ location.name }}</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="mb-4 mt-4">
+        <label for="description" class="block text-sm font-medium">Description</label>
+        <textarea id="description" formControlName="description" class="w-full mt-2 p-2 border rounded-md" rows="4" placeholder="Description"></textarea>
+      </div>
+
+      <!-- Visibility Toggle -->
+      <div class="flex justify-between items-center mb-4">
+        <div class="flex items-center space-x-2">
+          <input type="checkbox" formControlName="isHidden" class="toggle-switch" />
+          <label for="visibility-toggle" class="text-sm text-gray-700">Want this {{selectedType}} hidden?</label>
+        </div>
+
+        <!-- Cancel and Save Buttons -->
+        <div class="flex justify-end space-x-2">
+          <button (click)="closeModal()" class="px-4 py-2 text-sm bg-gray-300 text-gray-800 rounded-md">Cancel</button>
+          <button (click)="saveService()" class="px-4 py-2 items-center justify-center rounded-md p-2 bg-black text-white h-12">
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="isModalOpen && selectedType=='category'" class="modal-overlay">
+    <div class="modal-content-categoty">
+      <h3 class="text-lg font-semibold">Add Categoty</h3>
+
+     
+      <!-- Service Cost and Duration Sections -->
+      <div class="flex items-center space-x-4 mt-4">
+
+        <!-- Category -->
+        <div class="relative w-full">
+          <label for="category" class="block text-sm font-medium">Categoty Name</label>
+          <input id="category" formControlName="category" class="w-full mt-2 p-2 border rounded-md h-12"
+                 [ngClass]="{'border-red-500': serviceForm.get('category')?.touched && serviceForm.get('category')?.invalid}"
+                 placeholder="Category Name" />
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center mb-4 mt-4">
+        <!-- Cancel and Save Buttons -->
+        <div class="flex justify-end space-x-2">
+          <button (click)="closeModal()" class="px-4 py-2 text-sm bg-gray-300 text-gray-800 rounded-md">Cancel</button>
+          <button (click)="saveService()" class="px-4 py-2 items-center justify-center rounded-md p-2 bg-black text-white h-12">
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>

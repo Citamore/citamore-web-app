@@ -1,0 +1,57 @@
+.container {
+    @apply mx-auto p-4;
+  }
+  
+  .customization-panel {
+    @apply space-y-4;
+  }
+  
+  .preview-section {
+    @apply space-y-4;
+  }
+  
+  .preview-mobile {
+    @apply hidden lg:block;
+  }
+  
+  .preview-web {
+    @apply block lg:hidden;
+  }
+  
+  .input {
+    @apply p-1 border border-gray-300 rounded-md w-full text-sm h-10;
+  }
+  
+  .section {
+    @apply space-y-1;
+  }
+  
+  label {
+    @apply text-sm font-semibold;
+  }
+  
+  textarea {
+    @apply p-1 border border-gray-300 rounded-md w-full text-sm h-24;
+  }
+  
+  button {
+    @apply py-1 px-3 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600;
+  }
+  
+  .preview-content {
+    @apply text-sm space-y-2;
+  }
+  
+  .preview-content h1 {
+    @apply text-lg font-semibold;
+  }
+  
+  .preview-content p {
+    @apply text-sm;
+  }
+  
+  .selected {
+    background-color: #f1f1f1;  /* Light gray background for selected items */
+    border-color: #333;         /* Dark border for selected items */
+  }
+  

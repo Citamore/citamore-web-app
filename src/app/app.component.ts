@@ -3,9 +3,9 @@ import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  standalone:false,
+  styleUrls: ['./app.component.scss']  // Use 'styleUrls' (plural) here
 })
 export class AppComponent {
   title = 'book-my-service-web';

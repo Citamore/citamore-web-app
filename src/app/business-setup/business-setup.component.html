@@ -1,0 +1,94 @@
+
+  <div class="flex h-screen">
+    <!-- Sidebar -->
+    <div [ngStyle]="{ 'width': isExpanded ? '16rem' : '4rem' }" 
+         class="bg-white text-black h-full border-r border-gray-200 transition-all duration-300 
+                lg:w-64 lg:block md:w-16 md:flex flex-col">
+      <!-- Image and Text -->
+      <div class="p-4 flex items-center space-x-4">
+        <!-- Round Image on Left -->
+        <img src="assets/images/business-profile/haircut.jpg" alt="The Artistry Room" class="w-16 h-16 rounded-full object-cover">
+  
+        <!-- Text on Right (Visible only when expanded) -->
+        <div *ngIf="isExpanded">
+          <div class="text-sm font-semibold">The Artistry Room</div>
+          <div class="text-sm text-gray-600">Photography Studio</div>
+        </div>
+      </div>
+
+      <div class="sidenav-link">
+        <span (click)="toggleSidebar()" class="material-icons-outlined inline-block text-gray-600 text-[20px]"> 
+          {{ isExpanded ? 'chevron_left' : 'chevron_right' }}
+        </span>
+      </div>
+
+      <!-- Sidebar Content (Links with Icons) -->
+      <div *ngIf="isExpanded" class="space-y-4 p-4">
+        <div class="sidenav-link cursor-pointer"  [class.active]="section === 'myPage'"  (click)="getSection('myPage')">
+          <span class="material-icons-outlined inline-block mr-3 text-gray-600 text-[20px]">business</span>
+          <span>My Web Page</span>
+        </div>
+        <div class="sidenav-link cursor-pointer"  [class.active]="section === 'calender'" (click)="getSection('calender')">
+          <span class="material-icons-outlined inline-block mr-3 text-gray-600 text-[20px]">calendar_today</span>
+          <span>Calendar</span>
+        </div>
+        <div class="sidenav-link cursor-pointer"  [class.active]="section === 'services'" (click)="getSection('services')">
+          <span class="material-icons-outlined inline-block mr-3 text-gray-600 text-[20px]">room_service</span>
+          <span>Services</span>
+        </div>
+        <!-- <div class="sidenav-link" (click)="getSection('gyb')">
+          <span class="material-icons-outlined inline-block mr-3 text-gray-600 text-[20px]">connect_without_contact</span>
+          <span>Connect</span>
+        </div> -->
+        <div class="sidenav-link cursor-pointer" [class.active]="section === 'customers'" (click)="getSection('customers')">
+          <span class="material-icons-outlined inline-block mr-3 text-gray-600 text-[20px]">group</span>
+          <span>Customers</span>
+        </div>
+        <div class="sidenav-link cursor-pointer" [class.active]="section === 'payments'" (click)="getSection('payments')">
+          <span class="material-icons-outlined inline-block mr-3 text-gray-600 text-[20px]">payment</span>
+          <span>Payments</span>
+        </div>
+        <div class="sidenav-link cursor-pointer" [class.active]="section === 'settings'" (click)="getSection('settings')">
+          <span class="material-icons-outlined inline-block mr-3 text-gray-600 text-[20px]">settings</span>
+          <span>Settings</span>
+        </div>
+      </div>
+
+      <!-- Collapsed Sidebar Content (Only Icons) -->
+      <div *ngIf="!isExpanded" class="space-y-4 p-4">
+        <div class="sidenav-link">
+          <span class="material-icons-outlined inline-block mr-3 text-gray-600 text-[20px]">business</span>
+        </div>
+        <div class="sidenav-link">
+          <span class="material-icons-outlined inline-block mr-3 text-gray-600 text-[20px]">calendar_today</span>
+        </div>
+        <div class="sidenav-link">
+          <span class="material-icons-outlined inline-block mr-3 text-gray-600 text-[20px]">room_service</span>
+        </div>
+        <div class="sidenav-link">
+          <span class="material-icons-outlined inline-block mr-3 text-gray-600 text-[20px]">connect_without_contact</span>
+        </div>
+        <div class="sidenav-link">
+          <span class="material-icons-outlined inline-block mr-3 text-gray-600 text-[20px]">group</span>
+        </div>
+        <div class="sidenav-link">
+          <span class="material-icons-outlined inline-block mr-3 text-gray-600 text-[20px]">payment</span>
+        </div>
+        <div class="sidenav-link">
+          <span class="material-icons-outlined inline-block mr-3 text-gray-600 text-[20px]">settings</span>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Main content -->
+    <div class="flex-grow p-4">
+      <!-- Content goes here -->
+      <app-manage-services *ngIf="section == 'services'"></app-manage-services>
+      <app-manage-customers  *ngIf="section == 'customers'"></app-manage-customers>
+      <app-manage-calender *ngIf="section == 'calender'"></app-manage-calender>
+      <app-manage-payments  *ngIf="section == 'payments'"></app-manage-payments>
+      <app-manage-settings *ngIf="section == 'settings'"></app-manage-settings>
+      <app-manage-mypage  *ngIf="section == 'myPage'"></app-manage-mypage>
+    </div>
+  </div>
+

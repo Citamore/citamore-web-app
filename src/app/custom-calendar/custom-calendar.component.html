@@ -1,0 +1,66 @@
+<div>
+    <div class="max-w-md px-4 mx-auto">
+      <div class="md:grid md:divide-x md:divide-gray-200">
+        <!-- Calendar Navigation -->
+        <div>
+          <div class="flex items-center">
+            <h2 class="flex-auto font-semibold text-gray-900">
+              {{ currentMonth | date: 'MMMM yyyy' }}
+            </h2>
+            <button
+              type="button"
+              (click)="previousMonth()"
+              class="-my-1.5 flex items-center justify-center p-1.5 text-gray-400 hover:text-gray-500"
+            >
+              <span class="sr-only">Previous month</span>
+              <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              (click)="nextMonth()"
+              class="-my-1.5 ml-2 flex items-center justify-center p-1.5 text-gray-400 hover:text-gray-500"
+            >
+              <span class="sr-only">Next month</span>
+              <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+  
+          <!-- Calendar Grid -->
+          <div class="grid grid-cols-7 mt-10 text-xs leading-6 text-center text-gray-500">
+            <div *ngFor="let day of weekDays">{{ day }}</div>
+          </div>
+          <div class="grid grid-cols-7 mt-2 text-sm">
+            <div *ngFor="let day of daysInMonth" class="py-1.5">
+              <button
+                (click)="selectDay(day)"
+                [ngClass]="{
+                  'text-red-500': isToday(day),
+                  'bg-gray-900 text-white': isSelectedDay(day),
+                  'hover:bg-gray-200': !isSelectedDay(day)
+                }"
+                class="mx-auto flex h-8 w-8 items-center justify-center rounded-full"
+              >
+                {{ day.getDate() }}
+              </button>
+            </div>
+          </div>
+  
+          <!-- Select Button -->
+          <div class="flex justify-end mt-4">
+            <button
+            (click)="confirmSelection()"
+            class="px-4 py-2 text-sm font-medium text-white bg-black rounded hover:bg-gray-800 focus:outline-none"
+            >
+            Select
+            </button>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  

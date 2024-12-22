@@ -1,0 +1,211 @@
+{
+  "businessTypes": [
+    {
+      "id": 1,
+      "name": "Spa",
+      "icon": "assets/images/business-profile/haircut.jpg",
+      "description": "Relaxing spa treatments and massages.",
+      "businessCount": 23
+    },
+    {
+      "id": 2,
+      "name": "Salon",
+      "icon": "assets/images/business-profile/haircut.jpg",
+      "description": "Haircuts, styling, and beauty treatments.",
+      "businessCount": 45
+    },
+    {
+      "id": 3,
+      "name": "Photo Studio",
+      "icon": "assets/images/business-profile/haircut.jpg",
+      "description": "Professional photography services.",
+      "businessCount": 10
+    },
+    {
+      "id": 4,
+      "name": "Massage",
+      "icon": "assets/images/business-profile/haircut.jpg",
+      "description": "Relaxing and therapeutic massages.",
+      "businessCount": 30
+    }
+  ],
+  "popularBusinesses": [
+    {
+      "id": 1,
+      "name": "Luxury Spa",
+      "rating": 4.9,
+      "distance": "2.5 km",
+      "thumbnail": "assets/images/business-profile/haircut.jpg"
+    },
+    {
+      "id": 2,
+      "name": "Relax Massage",
+      "rating": 4.7,
+      "distance": "3.0 km",
+      "thumbnail": "assets/images/business-profile/haircut.jpg"
+    }
+  ],
+    "businesses": [
+      {
+        "id": 1,
+        "name": "Luxury Spa",
+        "rating": 4.9,
+        "distance": "2.5 km",
+        "offers": [
+          {
+            "id": 1,
+            "title": "50% off",
+            "description": "use code FREE50"
+          },
+          {
+            "id": 2,
+            "title": "60% off on Debit Card",
+            "description": "No coupon code required"
+          }
+        ],
+        "categories": [
+          {
+            "name": "Haircut",
+            "description": "A professional haircut for men and women",
+            "price": "20",
+            "services": [
+              { "name": "Men's Haircut", "description": "Classic men's haircut", "price": "15", "duration": "30", "serviceImage": "assets/images/business-profile/haircut.jpg" },
+              { "name": "Women's Haircut", "description": "Elegant women's haircut", "price": "25", "duration": "60", "serviceImage": "assets/images/business-profile/haircut.jpg" },
+              { "name": "Child's Haircut", "description": "Classic men's haircut", "price": "15", "duration": "30", "serviceImage": "assets/images/business-profile/haircut.jpg" },
+              { "name": "Hair Color", "description": "Elegant women's haircut", "price": "25", "duration": "60", "serviceImage": "assets/images/business-profile/haircut.jpg" }
+            ]
+          },
+          {
+            "name": "Face Care",
+            "description": "Facial treatments to rejuvenate the skin",
+            "price": "50",
+            "services": [
+              { "name": "Facial", "description": "A rejuvenating facial treatment", "price": "50", "duration": "20", "serviceImage": "assets/images/business-profile/haircut.jpg" },
+              { "name": "Scrub", "description": "Exfoliating scrub for smooth skin", "price": "20", "duration": "45", "serviceImage": "assets/images/business-profile/haircut.jpg" },
+              { "name": "Eyebrow Threading", "description": "Shape your eyebrows with threading", "price": "10", "duration": "15", "serviceImage": "assets/images/business-profile/haircut.jpg" }
+            ]
+          }
+        ],
+        "staff": [
+          {
+            "id": 1,
+            "name": "John Doe",
+            "image": "assets/images/staff/john_doe.jpg",
+            "schedule": {
+              "monday": "10:00 AM - 5:00 PM",
+              "tuesday": "10:00 AM - 5:00 PM",
+              "wednesday": "10:00 AM - 5:00 PM",
+              "thursday": "10:00 AM - 5:00 PM",
+              "friday": "10:00 AM - 5:00 PM",
+              "saturday": "Off",
+              "sunday": "10:00 AM - 5:00 PM"
+            },
+            "services": [
+              "Men's Haircut", 
+              "Women's Haircut", 
+              "Hair Color"
+            ],
+            "bookedSlots": [
+              { "date": "2024-12-10", "time": "01:00 PM", "service": "Men's Haircut", "duration": 30 },
+              { "date": "2024-12-06", "time": "10:30 AM", "service": "Men's Haircut", "duration": 30 },
+              { "date": "2024-12-11", "time": "01:00 PM", "service": "Men's Haircut", "duration": 30 },
+              { "date": "2024-12-15", "time": "10:30 AM", "service": "Men's Haircut", "duration": 30 },
+              { "date": "2024-12-13", "time": "01:00 PM", "service": "Men's Haircut", "duration": 30 },
+              { "date": "2024-12-13", "time": "10:30 AM", "service": "Men's Haircut", "duration": 30 },
+              { "date": "2024-12-15", "time": "01:00 PM", "service": "Men's Haircut", "duration": 30 },
+              { "date": "2024-12-15", "time": "04:30 PM", "service": "Men's Haircut", "duration": 30 }
+            ],
+            "timeOff": [
+              { "date": "2024-12-25", "reason": "Christmas Day" }
+            ]
+          },
+          {
+            "id": 2,
+            "name": "Jane Smith",
+            "image": "assets/images/staff/jane_smith.jpg",
+            "schedule": {
+              "monday": "10:00 AM - 5:00 PM",
+              "tuesday": "10:00 AM - 5:00 PM",
+              "wednesday": "10:00 AM - 5:00 PM",
+              "thursday": "Off",
+              "friday": "10:00 AM - 5:00 PM",
+              "saturday": "10:00 AM - 5:00 PM",
+              "sunday": "Off"
+            },
+            "services": [
+              "Facial", 
+              "Eyebrow Threading", 
+              "Scrub"
+            ],
+            "bookedSlots": [
+              { "date": "2024-11-30", "time": "11:00 AM", "service": "Facial", "duration": 30 },
+              { "date": "2024-11-30", "time": "11:30 AM", "service": "Eyebrow Threading", "duration": 15 }
+            ],
+            "timeOff": [
+              { "date": "2024-12-31", "reason": "New Year's Eve" }
+            ]
+          }
+        ],
+        "thumbnail": "assets/images/business-profile/haircut.jpg"
+      },
+      {
+        "id": 2,
+        "name": "Relax Massage",
+        "rating": 4.7,
+        "distance": "3.0 km",
+        "thumbnail": "assets/images/business-profile/haircut.jpg",
+        "offers": [
+          {
+            "id": 1,
+            "title": "50% off",
+            "description": "use code FREE50",
+            "image": "assets/images/offer1.jpg"
+          },
+          {
+            "id": 2,
+            "title": "60% off on Debit Card",
+            "description": "No coupon code required",
+            "image": "assets/images/offer2.jpg"
+          }
+        ],
+        "categories": [
+          {
+            "name": "Massage",
+            "description": "Relax with a full body massage",
+            "price": "40",
+            "services": [
+              { "name": "Swedish Massage", "description": "Gentle and relaxing massage", "price": "$40" },
+              { "name": "Deep Tissue Massage", "description": "Muscle relaxation massage", "price": "$50" }
+            ]
+          }
+        ],
+        "staff": [
+          {
+            "id": 3,
+            "name": "David Miller",
+            "image": "assets/images/staff/david_miller.jpg",
+            "schedule": {
+              "monday": "10:00 AM - 5:00 PM",
+              "tuesday": "10:00 AM - 5:00 PM",
+              "wednesday": "Off",
+              "thursday": "10:00 AM - 5:00 PM",
+              "friday": "10:00 AM - 5:00 PM",
+              "saturday": "Off",
+              "sunday": "Off"
+            },
+            "services": [
+              "Swedish Massage",
+              "Deep Tissue Massage"
+            ],
+            "bookedSlots": [
+              { "date": "2024-11-30", "time": "10:00 AM", "service": "Swedish Massage", "duration": 30 },
+              { "date": "2024-11-30", "time": "10:30 AM", "service": "Swedish Massage", "duration": 30 }
+            ],
+            "timeOff": [
+              { "date": "2024-12-25", "reason": "Christmas Day" }
+            ]
+          }
+        ]
+      }
+    ]
+}

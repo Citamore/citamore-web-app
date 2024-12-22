@@ -1,0 +1,68 @@
+
+@use './../../styles.scss';
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 60%;
+    height: fit-content;
+    max-width: 100%;
+  }
+
+  .modal-content-categoty{
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 40%;
+    height: fit-content;
+    max-width: 100%;
+  }
+
+  /* Add this in your global CSS or component-specific stylesheet */
+.toggle-switch {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 50px;
+    height: 26px;
+    background-color: #d1d5db; /* Light gray background */
+    border-radius: 9999px;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .toggle-switch:checked {
+    background-color: #000; /* Black background when checked */
+  }
+  
+  .toggle-switch:checked::before {
+    transform: translateX(24px); /* Move the knob to the right */
+    background-color: white; /* White knob */
+  }
+  
+  .toggle-switch::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 22px;
+    height: 22px;
+    background-color: #fff; /* White knob */
+    border-radius: 50%;
+    transition: transform 0.3s, background-color 0.3s;
+  }
+  
+  

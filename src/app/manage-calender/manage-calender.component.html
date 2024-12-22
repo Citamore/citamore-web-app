@@ -1,0 +1,283 @@
+<full-calendar [options]="calendarOptions"></full-calendar>
+
+
+<div *ngIf="showPopup" class="popup-overlay">
+  <div class="popup-container">
+    <div class="popup-header flex justify-between items-center border-b border-gray-200 pb-2">
+      <!-- Title -->
+      <h2 class="text-lg font-semibold">Appointment</h2>
+
+      <!-- Close Button -->
+      <span (click)="closePopup()" class="material-symbols-outlined text-gray-500 cursor-pointer hover:text-gray-700">
+        close
+      </span>
+    </div>
+
+    <!-- Category Dropdown -->
+    <div class="popup-info-item mt-4 relative">
+      <span class="material-symbols-outlined text-gray-500">category</span>
+      <div (click)="toggleDropdownCategory()"
+        class="popup-label hover-effect cursor-pointer flex items-center justify-between w-full">
+        <div class="flex items-center space-x-2 ml-2">
+          <!-- Ensure 'Service' is displayed by default -->
+          <span>{{ popupData.appointmentType || 'Service' }}</span>
+        </div>
+        <span class="ml-2 text-gray-500 material-symbols-outlined">expand_more</span>
+      </div>
+      <div *ngIf="dropdownTypeOpen"
+        class="absolute top-full left-0 mt-1 w-full bg-white border border-gray-300 shadow-lg rounded-md z-50 time-dropdown-open">
+        <ul class="text-sm text-gray-700">
+          <li *ngFor="let option of chooseAppointmentType" (click)="selectAppointmentType(option)"
+            class="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+            {{ option }}
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Event Name -->
+    <div class="popup-info-item mt-4 flex items-center space-x-2"
+      *ngIf="popupData.appointmentType === 'Event' || popupData.appointmentType === 'Blocked Time'">
+      <span class="material-symbols-outlined text-gray-500">event</span>
+      <div class="flex-1">
+        <span *ngIf="!editingField.eventName" (click)="editField('eventName')"
+          class="popup-label hover-effect w-full cursor-pointer">
+          {{ popupData.eventName || 'Event name' }}
+        </span>
+        <input *ngIf="editingField.eventName" [(ngModel)]="popupData.eventName" (blur)="saveField('eventName')"
+          class="popup-input w-full" placeholder="Event name" />
+      </div>
+    </div>
+
+    <!-- Date Picker and Time Dropdown -->
+    <div class="relative popup-info-item mt-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <span class="material-symbols-outlined text-gray-500">calendar_today</span>
+          <span *ngIf="!editingField.date" (click)="editField('date')" class="popup-label hover-effect cursor-pointer">
+            {{ getFormattedDate(popupData.date) }}
+          </span>
+        </div>
+        <div class="flex items-center space-x-2">
+          <!-- Start Time -->
+          <!-- Start Time Dropdown -->
+          <div class="relative time-dropdown">
+            <input type="text" [(ngModel)]="daysOfWeek[0].start"
+              (focus)="toggleStartEndDropdown('start', true, daysOfWeek[0])" placeholder="Start"
+              class="input text-gray-500 w-24 bg-white cursor-pointer" />
+            <div *ngIf="daysOfWeek[0].dropdownOpen.start"
+              class="absolute z-10 mt-1 bg-white border rounded-md max-h-[300px] overflow-y-auto" style="width: 80px;">
+              <ul class="text-xs">
+                <li *ngFor="let time of timeSlots" (click)="selectTime('start', time, daysOfWeek[0])"
+                  class="px-2 py-1 hover:bg-gray-100 cursor-pointer">
+                  {{ time }}
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <span *ngIf="popupData.appointmentType !== 'Reminder'" class="mx-2">–</span>
+
+          <!-- End Time Dropdown -->
+          <div *ngIf="popupData.appointmentType !== 'Reminder'" class="relative time-dropdown">
+            <input type="text" [(ngModel)]="daysOfWeek[0].end" placeholder="End"
+              class="input text-gray-500 w-24 bg-white cursor-pointer" disabled />
+          </div>
+
+        </div>
+      </div>
+      <div *ngIf="editingField.date" class="dropdown-calendar absolute z-50 border bg-white shadow-lg rounded-md">
+        <app-custom-calendar (selectedDate)="onDateSelected($event)" class="calendar-popup"></app-custom-calendar>
+      </div>
+    </div>
+
+    <!-- Repeat Dropdown -->
+    <div class="popup-info-item mt-4 relative" *ngIf="popupData.appointmentType !== 'Reminder'">
+      <span class="material-symbols-outlined text-gray-500">event_repeat</span>
+      <div (click)="toggleDropdown()"
+        class="popup-label hover-effect cursor-pointer flex items-center justify-between w-full">
+        <div class="flex items-center space-x-2 ml-2">
+          <span>{{ popupData.repeats || 'Does not repeat' }}</span>
+        </div>
+        <span class="ml-2 text-gray-500 material-symbols-outlined">expand_more</span>
+      </div>
+      <div *ngIf="editingField.repeats"
+        class="absolute top-full left-0 mt-1 w-full bg-white border shadow-lg rounded-md z-50">
+        <ul class="text-sm text-gray-700">
+          <li *ngFor="let option of repeatOptions" (click)="selectRepeatOption(option)"
+            class="px-4 py-2 hover:bg-gray-100 cursor-pointer">{{ option }}</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Dynamic Fields -->
+    <div *ngIf="popupData.appointmentType === 'Service' || popupData.appointmentType === 'Class'"
+      class="popup-info-item mt-4 relative">
+      <span class="material-symbols-outlined text-gray-500">linked_services</span>
+
+      <!-- Dropdown Trigger -->
+      <div (click)="toggleServiceDropdown()"
+        class="popup-label hover-effect cursor-pointer flex items-center justify-between w-full">
+        <div class="flex items-center space-x-2 ml-2">
+          <span>{{ selectedService?.name || 'Select a Service/Class' }}</span>
+        </div>
+        <span class="ml-2 text-gray-500 material-symbols-outlined">expand_more</span>
+      </div>
+
+      <!-- Dropdown Menu -->
+      <div *ngIf="dropdownServiceOpen"
+        class="absolute top-full left-0 mt-1 w-full bg-white border border-gray-300 shadow-lg rounded-md z-50 max-h-60 overflow-y-auto">
+        <ul class="text-sm text-gray-700">
+          <li *ngFor="let service of services" (click)="selectService(service)"
+            class="px-4 py-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center">
+            <div>
+              <div class="font-semibold">{{ service.name }}</div>
+              <div class="text-xs text-gray-500">{{ service.duration }} minutes</div>
+            </div>
+            <div class="text-sm font-medium text-gray-700">${{ service.price }}</div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+
+
+    <!-- Staff Dropdown -->
+    <div *ngIf="popupData.appointmentType === 'Service' || popupData.appointmentType === 'Class'"
+      class="popup-info-item mt-4 relative">
+      <span class="material-symbols-outlined text-gray-500">face</span>
+
+      <!-- Dropdown Trigger -->
+      <div [class.disabled]="!selectedService" (click)="selectedService ? toggleStaffDropdown() : null"
+        class="popup-label hover-effect cursor-pointer flex items-center justify-between w-full">
+        <div class="flex items-center space-x-2 ml-2">
+          <span>{{ selectedStaff?.name || 'Select a Staff' }}</span>
+        </div>
+        <span class="ml-2 text-gray-500 material-symbols-outlined">expand_more</span>
+      </div>
+
+      <!-- Dropdown Menu -->
+      <div *ngIf="dropdownStaffOpen"
+        class="absolute top-full left-0 mt-1 w-full bg-white border border-gray-300 shadow-lg rounded-md z-50 max-h-60 overflow-y-auto">
+        <ul class="text-sm text-gray-700">
+          <li *ngFor="let staff of staffList" (click)="selectStaff(staff)"
+            class="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center space-x-3">
+            <!-- Staff Image -->
+            <img [src]="staff.image" alt="{{ staff.name }}" class="w-8 h-8 rounded-full border border-gray-300" />
+
+            <!-- Staff Info -->
+            <div class="flex-1">
+              <div class="font-semibold">{{ staff.name }}</div>
+              <div class="text-xs text-gray-500">{{ staff.role }}</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+
+    <div *ngIf="popupData.appointmentType === 'Event'"
+      class="popup-info-item mt-4 flex items-center space-x-2 relative">
+      <span class="material-symbols-outlined text-gray-500">location_on</span>
+
+      <!-- Clickable Label -->
+      <div class="flex-1">
+        <span *ngIf="!editingField.location" (click)="editField('location')"
+          class="popup-label hover-effect w-full cursor-pointer">
+          {{ popupData.location || 'Search location' }}
+        </span>
+
+        <!-- Input Field -->
+        <input *ngIf="editingField.location" type="text" class="popup-input w-full" placeholder="Search location"
+          [(ngModel)]="popupData.location" (blur)="saveField('location')" (focus)="showLocationDropdown()"
+          (input)="onLocationInputChange($event)" />
+      </div>
+
+      <!-- Suggestions Dropdown -->
+      <div *ngIf="dropdownLocationOpen"
+        class="absolute top-full left-0 mt-1 w-full bg-white border border-gray-300 shadow-lg rounded-md z-50 max-h-60 overflow-y-auto">
+        <ul class="text-sm text-gray-700">
+          <!-- Show Preloaded Locations -->
+          <li *ngFor="let location of existingLocations" (click)="selectLocation(location)"
+            class="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+            {{ location }}
+          </li>
+
+          <!-- Divider -->
+          <li *ngIf="existingLocations.length > 0 && searchedLocations.length > 0"
+            class="border-t border-gray-300 my-1"></li>
+
+          <!-- Show Searched Locations -->
+          <li *ngFor="let location of searchedLocations" (click)="selectLocation(location.description)"
+            class="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+            {{ location.description }}
+          </li>
+        </ul>
+      </div>
+    </div>
+
+
+
+
+    <div *ngIf="popupData.appointmentType !== 'Blocked Time' && popupData.appointmentType !== 'Reminder'"
+      class="popup-info-item mt-4 flex items-center space-x-2">
+      <span class="material-symbols-outlined text-gray-500">group</span>
+      <div class="flex-1 relative">
+        <!-- Display text or input field -->
+        <span *ngIf="!editingField.guests" (click)="editField('guests')"
+          class="popup-label hover-effect w-full cursor-pointer">
+          {{ popupData.guests || 'Add guest(s)' }}
+        </span>
+        <input *ngIf="editingField.guests" [(ngModel)]="popupData.guests" (input)="onGuestSearch(popupData.guests)"
+          (focus)="showAllGuests()" (blur)="saveField('guests')" class="popup-input w-full"
+          placeholder="Add guest(s)" />
+
+        <!-- Dropdown Suggestions -->
+        <div *ngIf="filteredGuests.length > 0"
+          class="absolute top-full left-0 mt-1 w-full bg-white border border-gray-300 shadow-lg rounded-md z-50 max-h-60 overflow-y-auto">
+          <ul class="text-sm text-gray-700">
+            <li *ngFor="let guest of filteredGuests" (click)="selectGuest(guest)"
+              class="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center space-x-3">
+              <!-- Round Initials or Image -->
+              <div
+                class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-gray-200 text-gray-700 font-semibold">
+                <!-- <img *ngIf="guest.image_url" [src]="guest.image_url" alt="{{ guest.name }}" class="w-full h-full rounded-full" /> -->
+                <span>{{ getInitials(guest.name) }}</span>
+              </div>
+              <!-- Guest Info -->
+              <div class="flex-1">
+                <div class="font-semibold">{{ guest.name }}</div>
+                <div class="text-xs text-gray-500">{{ guest.email }} | {{ guest.phone }}</div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+
+
+    <div class="popup-info-item mt-4 flex items-center space-x-2">
+      <span class="material-symbols-outlined text-gray-500">edit_note</span>
+      <div class="flex-1">
+        <!-- Display Text -->
+        <span *ngIf="!editingField.notes" (click)="editField('notes')"
+          class="popup-label hover-effect w-full cursor-pointer">
+          {{ popupData.notes || 'Add notes' }}
+        </span>
+
+        <!-- Textarea Input -->
+        <textarea *ngIf="editingField.notes" [(ngModel)]="popupData.notes" (blur)="saveField('notes')"
+          placeholder="Notes" rows="3" class="popup-input w-full"></textarea>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="popup-footer">
+      <button class="popup-create-btn" (click)="handleSaveEvent()">
+        {{ popupData.booking_id ? 'Edit' : 'Create' }}
+      </button>
+      <button class="popup-cancel-btn" (click)="closePopup()">Cancel</button>
+    </div>
+  </div>
+</div>

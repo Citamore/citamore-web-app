@@ -1,0 +1,114 @@
+
+  <h2 class="text-2xl font-semibold">Services</h2>
+
+  <!-- Filter Dropdown -->
+  <div class="flex items-center mb-4 mt-4">
+    <div class="text-md font-semibold mr-4">Filter</div>
+    
+    <div class="relative flex items-center space-x-2">
+      <!-- Service Button (Active/Inactive) -->
+      <button 
+        (click)="selectedType = 'service'" 
+        [ngClass]="{'bg-black text-white font-semibold': selectedType === 'service', 'bg-gray-200 text-gray-600': selectedType !== 'service'}" 
+        class="p-2 text-sm font-medium rounded-md">
+        Service
+      </button>
+
+      <!-- Class Button (Active/Inactive) -->
+      <button 
+        (click)="selectedType = 'class'" 
+        [ngClass]="{'bg-black text-white font-semibold' : selectedType === 'class', 'bg-gray-200 text-gray-600': selectedType !== 'class'}" 
+        class="p-2 text-sm font-medium rounded-md">
+        Class
+      </button>
+
+      <!-- Button for Dropdown (Light Grey BG with + Icon) -->
+      <button 
+      (click)="toggleAddDropdown($event);$event.stopPropagation();" 
+      class="items-center justify-center rounded-full p-2">
+      <span class="material-icons-outlined">add</span>
+    </button>
+    
+    <!-- Dropdown with Service and Class Options -->
+    <div *ngIf="dropdownAddService" 
+         class="absolute mt-2 bg-white shadow-lg rounded-lg border border-gray-200 w-48"
+         [ngStyle]="{ top: dropdownPosition.top, left: dropdownPosition.left }">
+      <ul class="py-2">
+        <li class="px-4 py-2 text-gray-600 hover:bg-gray-100 cursor-pointer" (click)="setType('service')">Service</li>
+        <li class="px-4 py-2 text-gray-600 hover:bg-gray-100 cursor-pointer" (click)="setType('class')">Class</li>
+        <li class="px-4 py-2 text-gray-600 hover:bg-gray-100 cursor-pointer" (click)="setType('category')">Category</li>
+      </ul>
+    </div>
+    </div>
+  </div>
+
+  <div class="flex flex-col space-y-4 p-4">
+    <!-- Loop through the categories -->
+    <div *ngFor="let category of categories">
+      <!-- Category Name -->
+      <div class="text-lg font-semibold">{{ category.name }} ({{ getServicesByCategory(category.name).length }})</div>
+
+      <!-- Loop through services for the category -->
+      <div cdkDropList #todoList="cdkDropList" [cdkDropListData]="getServicesByCategory(category.name)" class="example-list" (cdkDropListDropped)="drop($event)">
+        <div *ngFor="let service of getServicesByCategory(category.name); let i = index" 
+             cdkDrag 
+             class="flex bg-white p-4 rounded-lg overflow-hidden border-2 border-gray-100 cursor-move relative group mt-4">
+          
+          <!-- Image -->
+          <img src="assets/images/business-profile/haircut.jpg" alt="Service Image" class="w-16 h-16 object-cover rounded-lg">
+      
+          <!-- Content -->
+          <div class="pt-0 pl-4 pr-4 flex flex-col justify-between h-full">
+            <!-- Service Title -->
+            <div class="text-sm font-bold">{{ service.name }}</div>
+            
+            <!-- Service Duration and Cost -->
+            <div class="text-sm text-gray-400 mt-auto">Duration: {{service.duration}} Mins</div>
+            <div class="text-sm text-gray-400 mt-auto">${{service.price}}</div>
+          </div>
+      
+          <!-- Right Side: Icons and Share Button -->
+          <div class="flex items-center justify-center ml-auto space-x-3">
+            <div *ngFor="let staff of service.staff" class="flex items-center flex-shrink-0">
+              <img [src]="staff.imageUrl" alt="{{ staff.name }}" class="w-10 h-10 object-cover rounded-full border-2 border-white">
+            </div>
+        
+            <!-- Share Button -->
+            <button class="p-2 rounded-full">
+              <span class="material-icons-outlined text-gray-600">share</span>
+            </button>
+        
+            <!-- Link Icon -->
+            <button class="p-2 rounded-full">
+              <span class="material-icons-outlined text-gray-600">link</span>
+            </button>
+        
+            <!-- More Options Icon -->
+            <button (click)="toggleMenu($event, i);$event.stopPropagation();" class="p-2 rounded-full">
+              <span class="material-icons-outlined text-gray-600">more_vert</span>
+            </button>
+            <div *ngIf="menuOpen && selectedIndex === i" 
+            class="absolute z-50 bg-white shadow-lg rounded-lg border border-gray-200 mt-2"
+            style="width: 150px; height: 200px; height: auto;">
+            <ul class="py-2">
+              <li class="px-4 py-2 text-gray-600 hover:bg-gray-100 cursor-pointer">Preview</li>
+              <li class="px-4 py-2 text-gray-600 hover:bg-gray-100 cursor-pointer">Edit</li>
+              <li class="px-4 py-2 text-gray-600 hover:bg-gray-100 cursor-pointer">Duplicate</li>
+              <li class="px-4 py-2 text-gray-600 hover:bg-gray-100 cursor-pointer">Delete</li>
+              <li class="px-4 py-2 text-gray-600 hover:bg-gray-100 cursor-pointer">Set to hidden</li>
+            </ul>
+           </div>
+          </div>    
+        </div>
+      </div>
+    </div>
+  </div>
+
+ 
+  <app-add-edit-services
+  [isModalOpen]="isModalOpen" 
+  [categories]="categories"
+  [selectedType]="selectedType"
+  (closeModalEvent)="closeModal()"
+  (saveServiceEvent)="saveService($event)">
+</app-add-edit-services>

@@ -1,0 +1,703 @@
+<div class="flex h-full">
+  <!-- Left Panel: Customer List with Search Bar and "+" Button -->
+  <div class="w-1/4 overflow-y-auto border-r relative pr-2">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-semibold">Customers</h2>
+
+      <!-- Left Panel: Import and Export buttons (aligned to the right) -->
+      <div class="flex space-x-4 ml-auto">
+        <button class="w-6 h-6 p-1 rounded-full bg-black text-white flex justify-center items-center"
+          matTooltip="Import Contacts" matTooltipPosition="above" (click)="openImportModal()">
+          <span class="material-icons-outlined text-base">file_upload</span>
+        </button>
+
+        <button class="w-6 h-6 p-1 rounded-full bg-black text-white flex justify-center items-center"
+          matTooltip="Export Contacts" matTooltipPosition="above" (click)="exportData()">
+          <span class="material-icons-outlined text-base">file_download</span>
+        </button>
+
+        <button class="w-6 h-6 p-1 rounded-full bg-black text-white flex justify-center items-center"
+          matTooltip="Add Contact" matTooltipPosition="above" (click)="addContact()">
+          <span class="material-icons-outlined text-xs">add</span>
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="isAddCustomerModalOpen" class="popup-overlay">
+      <div class="popup-container max-h-[80%] overflow-y-auto w-full sm:w-3/4 lg:w-1/3">
+        <!-- Modal Header -->
+        <div class="popup-header flex justify-between items-center border-b border-gray-200 pb-2">
+          <h2 class="text-lg font-semibold">{{ isEditMode ? 'Edit Customer' : 'Add Customer' }}</h2>
+          <span (click)="closeAddCustomerModal()"
+            class="material-symbols-outlined text-gray-500 cursor-pointer hover:text-gray-700">
+            close
+          </span>
+        </div>
+
+        <!-- Profile Image Upload -->
+        <div class="relative w-16 h-16 bg-gray-200 rounded-full mt-4 mx-auto flex items-center justify-center">
+          <!-- Centered Person Icon -->
+          <span *ngIf="!newCustomer.profileImage" class="material-symbols-outlined text-gray-500 absolute text-4xl">
+            person
+          </span>
+
+          <!-- Profile Image -->
+          <img *ngIf="newCustomer.profileImage" [src]="newCustomer.profileImage" alt="Profile Image"
+            class="w-full h-full rounded-full object-cover" />
+
+          <!-- Add Button -->
+          <button
+            class="absolute bottom-0 right-0 p-0 w-4 h-4 rounded-full bg-black text-white flex items-center justify-center"
+            (click)="uploadProfileImage()">
+            <span class="material-symbols-outlined text-[10px]">add</span>
+          </button>
+
+
+        </div>
+
+
+        <!-- Customer Information -->
+        <div class="popup-info-item mt-4">
+          <div class="grid grid-cols-1 gap-4">
+            <!-- Full Name -->
+            <div class="popup-info-item flex items-center space-x-2">
+              <span class="material-symbols-outlined text-gray-500">person</span>
+              <div class="flex-1">
+                <span *ngIf="!editingField['name']" (click)="editField('name')"
+                  class="popup-label hover-effect cursor-pointer">
+                  {{ newCustomer.name || 'Full Name' }}
+                </span>
+                <input *ngIf="editingField['name']" [(ngModel)]="newCustomer.name" (blur)="saveField('name')"
+                  class="popup-input w-full" placeholder="Enter full name" />
+              </div>
+            </div>
+
+            <!-- Phone and Country Code -->
+            <!-- Primary Phone Number -->
+            <div class="popup-info-item flex items-center space-x-2">
+              <span class="material-symbols-outlined text-gray-500">phone</span>
+              <div class="flex-1 relative">
+                <!-- Display Primary Country Code and Phone -->
+                <span *ngIf="!editingField['phone'] && !editingField['countryCode']" (click)="editField('phone')"
+                  class="popup-label hover-effect cursor-pointer flex items-center justify-between">
+                  <div class="flex items-center space-x-2">
+                    <img *ngIf="selectedCountryFlag" [src]="selectedCountryFlag" alt="flag" class="w-6 h-4" />
+                    <span>{{ selectedCountryCode }}</span>
+                    <span class="ml-4">{{ primaryPhone.number || 'Phone' }}</span>
+                  </div>
+                </span>
+
+                <!-- Inputs for Editing -->
+                <div *ngIf="editingField['phone'] || editingField['countryCode']" class="flex items-center space-x-4">
+                  <!-- Dropdown for Country Code -->
+                  <div class="relative">
+                    <div class="flex items-center space-x-2 cursor-pointer border-gray-300 p-2 rounded bg-white w-28"
+                      (click)="toggleDropdownForField('primary')">
+                      <img *ngIf="selectedCountryFlag" [src]="selectedCountryFlag" alt="flag" class="w-6 h-4" />
+                      <span>{{ selectedCountryCode }}</span>
+                      <span class="material-symbols-outlined text-gray-500">expand_more</span>
+                    </div>
+
+                    <!-- Country Code Dropdown -->
+                    <div *ngIf="editingField['phoneDropdown_primary']"
+                      class="absolute z-50 bg-white border border-gray-300 shadow-lg rounded w-48 max-h-60 overflow-y-auto">
+                      <div class="p-2">
+                        <input type="text" [(ngModel)]="searchQuery" class="w-full p-1 border border-gray-300 rounded"
+                          placeholder="Search country code" />
+                      </div>
+                      <ul>
+                        <li *ngFor="let country of filterCountryCodes()"
+                          (click)="selectCountryCodeForField('primary', country)"
+                          class="flex items-center space-x-2 p-2 hover:bg-gray-100 cursor-pointer">
+                          <img [src]="country.flag" alt="{{ country.name }}" class="w-6 h-4" />
+                          <span>{{ country.name }}</span>
+                          <span class="ml-auto text-gray-500">{{ country.code }}</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <!-- Input for Phone Number -->
+                  <input [(ngModel)]="primaryPhone.number" class="popup-input w-full" placeholder="Enter phone number"
+  (focus)="editField('phone')" />
+
+                </div>
+              </div>
+
+              <!-- Add Phone Button -->
+              <button class="material-symbols-outlined text-gray-500 cursor-pointer hover:text-gray-700"
+                (click)="addPhoneNumberField()">
+                add
+              </button>
+            </div>
+
+            <!-- Additional Phone Numbers -->
+            <div *ngFor="let phone of additionalPhoneFields; let i = index"
+              class="popup-info-item flex items-center space-x-2 mt-2">
+              <span class="material-symbols-outlined text-gray-500">phone</span>
+              <div class="flex-1 flex items-center space-x-4">
+                <!-- Dropdown for Country Code -->
+                <div class="relative">
+                  <div class="flex items-center space-x-2 cursor-pointer border-gray-300 p-2 rounded bg-white w-28"
+                    (click)="toggleDropdownForField(i)">
+                    <img *ngIf="phone.selectedFlag" [src]="phone.selectedFlag" alt="flag" class="w-6 h-4" />
+                    <span>{{ phone.selectedCode || '+1' }}</span> <!-- Default to +1 -->
+                    <span class="material-symbols-outlined text-gray-500">expand_more</span>
+                  </div>
+
+                  <!-- Country Code Dropdown -->
+                  <div *ngIf="editingField['phoneDropdown_' + i]"
+                    class="absolute z-50 bg-white border border-gray-300 shadow-lg rounded w-48 max-h-60 overflow-y-auto">
+                    <div class="p-2">
+                      <input type="text" [(ngModel)]="phone.searchQuery"
+                        class="w-full p-1 border border-gray-300 rounded" placeholder="Search country code" />
+                    </div>
+                    <ul>
+                      <li *ngFor="let country of filterCountryCodes(phone.searchQuery)"
+                        (click)="selectCountryCodeForField(i, country)"
+                        class="flex items-center space-x-2 p-2 hover:bg-gray-100 cursor-pointer">
+                        <img [src]="country.flag" alt="{{ country.name }}" class="w-6 h-4" />
+                        <span>{{ country.name }}</span>
+                        <span class="ml-auto text-gray-500">{{ country.code }}</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                <!-- Input for Phone Number -->
+                <input [(ngModel)]="phone.number" class="popup-input w-full" placeholder="Enter phone number" />
+
+                <!-- Remove Button -->
+                <button class="material-symbols-outlined text-gray-500 cursor-pointer hover:text-red-700"
+                  (click)="removePhoneNumberField(i)">
+                  delete
+                </button>
+              </div>
+            </div>
+
+
+
+
+            <!-- Email -->
+            <!-- Primary Email Field -->
+            <div class="popup-info-item flex items-center space-x-2">
+              <span class="material-symbols-outlined text-gray-500">email</span>
+              <div class="flex-1">
+                <span *ngIf="!editingField['email']" (click)="editingField['email'] = true"
+                  class="popup-label hover-effect cursor-pointer">
+                  {{ newCustomer.email || 'Email Address' }}
+                </span>
+                <input *ngIf="editingField['email']" [(ngModel)]="newCustomer.email" (blur)="savePrimaryEmail()"
+                  class="popup-input w-full" placeholder="Enter email address" />
+              </div>
+              <!-- Add Button for Additional Emails -->
+              <div>
+                <button (click)="addEmailField()" class="text-gray-500 hover:text-gray-700 material-symbols-outlined"
+                  aria-label="Add Email">
+                  add
+                </button>
+              </div>
+            </div>
+
+            <!-- Additional Email Fields -->
+            <div *ngFor="let emailField of additionalEmails; let i = index"
+              class="popup-info-item flex items-center space-x-2">
+              <span class="material-symbols-outlined text-gray-500">email</span>
+              <div class="flex-1">
+                <span *ngIf="!editingField['email_' + i]" (click)="editingField['email_' + i] = true"
+                  class="popup-label hover-effect cursor-pointer">
+                  {{ emailField.email || 'Email Address' }}
+                </span>
+                <input *ngIf="editingField['email_' + i]" [(ngModel)]="emailField.email" (blur)="saveEmailField(i)"
+                  class="popup-input w-full" placeholder="Enter email address" />
+              </div>
+              <!-- Remove Button -->
+              <div>
+                <button (click)="removeEmailField(i)" class="text-gray-500 hover:text-red-700 material-symbols-outlined"
+                  aria-label="Remove Email">
+                  delete
+                </button>
+              </div>
+            </div>
+
+
+
+            <!-- Company -->
+            <div class="popup-info-item flex items-center space-x-2">
+              <span class="material-symbols-outlined text-gray-500">business</span>
+              <div class="flex-1">
+                <span *ngIf="!editingField['company']" (click)="editField('company')"
+                  class="popup-label hover-effect cursor-pointer">
+                  {{ newCustomer.company || 'Company Name' }}
+                </span>
+                <input *ngIf="editingField['company']" [(ngModel)]="newCustomer.company" (blur)="saveField('company')"
+                  class="popup-input w-full" placeholder="Enter company name" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Address Section -->
+        <h4 class="text-lg font-semibold mt-6 mb-4">Address</h4>
+        <div class="popup-info-item">
+          <div class="grid grid-cols-1 gap-4">
+            <!-- Address -->
+            <!-- Address Input with Suggestions -->
+            <div class="popup-info-item flex items-center space-x-2 relative">
+              <span class="material-symbols-outlined text-gray-500">location_on</span>
+              <div class="flex-1">
+                <span *ngIf="!editingField['address']" (click)="editField('address')"
+                  class="popup-label hover-effect cursor-pointer">
+                  {{ newCustomer.address || 'Address' }}
+                </span>
+                <div *ngIf="editingField['address']" class="relative">
+                  <input [(ngModel)]="newCustomer.address" (input)="getLocations(newCustomer.address)"
+                    (blur)="saveField('address')" class="popup-input w-full" placeholder="Enter address" />
+                  <!-- Suggestions Dropdown -->
+                  <ul *ngIf="searchedLocations.length > 0"
+                    class="absolute z-50 bg-white border border-gray-300 shadow-lg rounded w-full max-h-60 overflow-y-auto mt-1">
+                    <li *ngFor="let location of searchedLocations" 
+                    (mousedown)="onLocationClick(location, $event)"
+                    class="p-2 hover:bg-gray-100 cursor-pointer">
+                  {{ location.description }}
+                </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+
+            <!-- City -->
+            <div class="popup-info-item flex items-center space-x-2">
+              <span class="material-symbols-outlined text-gray-500">location_city</span>
+              <div class="flex-1">
+                <span *ngIf="!editingField['city']" (click)="editField('city')"
+                  class="popup-label hover-effect cursor-pointer">
+                  {{ newCustomer.city || 'City' }}
+                </span>
+                <input *ngIf="editingField['city']" [(ngModel)]="newCustomer.city" (blur)="saveField('city')"
+                  class="popup-input w-full" placeholder="Enter city" />
+              </div>
+            </div>
+
+            <!-- Postal Code -->
+            <div class="popup-info-item flex items-center space-x-2">
+              <span class="material-symbols-outlined text-gray-500">markunread_mailbox</span>
+              <div class="flex-1">
+                <span *ngIf="!editingField['postal']" (click)="editField('postal')"
+                  class="popup-label hover-effect cursor-pointer">
+                  {{ newCustomer.postal_code || 'Postal Code' }}
+                </span>
+                <input *ngIf="editingField['postal']" [(ngModel)]="newCustomer.postal_code" (blur)="saveField('postal')"
+                  class="popup-input w-full" placeholder="Enter postal code" />
+              </div>
+            </div>
+
+            <!-- Province -->
+            <div class="popup-info-item flex items-center space-x-2">
+              <span class="material-symbols-outlined text-gray-500">map</span>
+              <div class="flex-1">
+                <span *ngIf="!editingField['province']" (click)="editField('province')"
+                  class="popup-label hover-effect cursor-pointer">
+                  {{ newCustomer.province || 'Province' }}
+                </span>
+                <input *ngIf="editingField['province']" [(ngModel)]="newCustomer.province"
+                  (blur)="saveField('province')" class="popup-input w-full" placeholder="Enter province" />
+              </div>
+            </div>
+
+            <!-- Country -->
+            <div class="popup-info-item flex items-center space-x-2">
+              <span class="material-symbols-outlined text-gray-500">public</span>
+              <div class="flex-1">
+                <span *ngIf="!editingField['country']" (click)="editField('country')"
+                  class="popup-label hover-effect cursor-pointer">
+                  {{ newCustomer.country || 'Country' }}
+                </span>
+                <input *ngIf="editingField['country']" [(ngModel)]="newCustomer.country" (blur)="saveField('country')"
+                  class="popup-input w-full" placeholder="Enter country" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional Fields Section -->
+        <h4 *ngIf="additionalFields.length" class="text-lg font-semibold mt-6 mb-4">Additional Fields</h4>
+        <div *ngFor="let field of additionalFields; let i = index" class="popup-info-item flex items-center space-x-2">
+          <span class="material-symbols-outlined text-gray-500">{{ field.icon }}</span>
+          <div class="flex-1">
+            <input [(ngModel)]="field.value" class="popup-input w-full" placeholder="Enter {{ field.label }}" />
+          </div>
+          <button (click)="removeAdditionalField(i)" class="text-gray-500 hover:text-red-700 material-symbols-outlined"
+            aria-label="Remove Field">
+            delete
+          </button>
+        </div>
+
+        <!-- Modal Footer -->
+        <!-- Additional Fields Button -->
+        <div class="popup-footer mt-6 flex items-center" style="justify-content: space-between !important;">
+          <!-- Add Additional Field Button -->
+          <div class="relative">
+            <button (click)="toggleAdditionalFieldsDropdown()" class="flex items-center space-x-2">
+              <span class="material-symbols-outlined text-md text-gray-500">add</span>
+            </button>
+
+            <!-- Dropdown Menu -->
+            <div *ngIf="dropdownAdditionalFieldsOpen"
+              class="absolute bottom-full left-0 mb-2 z-50 bg-white border border-gray-300 shadow-lg rounded w-40">
+              <ul>
+                <li *ngFor="let option of additionalFieldOptions" (click)="addAdditionalField(option)"
+                  class="flex items-center space-x-2 p-2 hover:bg-gray-100 cursor-pointer">
+                  <span class="text-sm text-gray-500">{{ option.label }}</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Save and Cancel Buttons -->
+          <div class="flex space-x-4">
+            <button class="popup-create-btn" (click)="saveCustomer()">Save</button>
+            <button class="popup-cancel-btn" (click)="closeAddCustomerModal()">Cancel</button>
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+
+
+    <!-- Search Bar -->
+    <div class="relative mb-4 p-4">
+      <div class="relative">
+        <!-- Search Input -->
+        <input type="text"
+          class="w-full pl-10 pr-4 py-1.5 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm placeholder-gray-500"
+          placeholder="Search by name..." [(ngModel)]="searchQuery" (input)="filterCustomers()" />
+        <!-- Search Icon -->
+        <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+          <span class="material-icons-outlined text-sm">search</span>
+        </span>
+      </div>
+    </div>
+    
+
+    <!-- No Customers Message -->
+    <div *ngIf="customers.length === 0" class="flex items-center justify-center h-full">
+      <p class="text-gray-500 text-sm text-center">
+        No customers yet. Click the <span class="font-semibold text-gray-700">"Add Customer"</span> button above to
+        create a new one.
+      </p>
+    </div>
+
+
+    <!-- Customer Groups (Grouped by letter) -->
+    <div *ngFor="let letter of alphabet">
+      <div *ngIf="customerGroups[letter]">
+        <h3 class="text-md font-semibold text-gray-700">{{ letter }}</h3>
+        <ul class="space-y-2">
+          <li *ngFor="let customer of customerGroups[letter]" class="cursor-pointer p-2 rounded text-sm text-gray-500"
+            [ngClass]="{'bg-gray-200': selectedCustomer === customer}" (click)="openCustomerModal(customer)">
+            {{ customer.name }}
+          </li>
+        </ul>
+      </div>
+    </div>
+    <!-- Import Modal -->
+    <div *ngIf="showImportModal" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
+      <div class="bg-white rounded-lg p-6 w-1/2 h-[80%] overflow-y-auto">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-semibold">Import Customer Data</h3>
+          <button (click)="closeImportModal()" class="text-black text-xl">&times;</button>
+        </div>
+
+        <!-- File Upload -->
+        <div class="mb-4">
+          <label class="block text-sm font-semibold">Select CSV File</label>
+          <input type="file" accept=".csv" (change)="onFileChange($event)"
+            class="w-full p-2 border border-gray-300 rounded-lg mt-2" />
+        </div>
+
+        <!-- Table to Display CSV Data -->
+        <div *ngIf="csvData.length > 0">
+          <table class="table-auto w-full mt-4" style="table-layout: fixed;">
+            <thead>
+              <tr>
+                <th class="px-2 py-1">Name</th>
+                <th class="px-2 py-1">Phone</th>
+                <th class="px-2 py-1">Email</th>
+                <th class="px-2 py-1">Address</th>
+                <th class="px-2 py-1">Company</th>
+                <th class="px-2 py-1" style="width: 50px; min-width: 30px; text-align: center;">Actions</th>
+                <!-- Reduced width for Actions column -->
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let customer of csvData; let i = index">
+                <td class="px-2 py-1">
+                  <input [(ngModel)]="customer.name" class="w-full p-1 border border-gray-300 rounded-lg" />
+                </td>
+                <td class="px-2 py-1">
+                  <input [(ngModel)]="customer.phone" class="w-full p-1 border border-gray-300 rounded-lg" />
+                </td>
+                <td class="px-2 py-1">
+                  <input [(ngModel)]="customer.email" class="w-full p-1 border border-gray-300 rounded-lg" />
+                </td>
+                <td class="px-2 py-1">
+                  <input [(ngModel)]="customer.address" class="w-full p-1 border border-gray-300 rounded-lg" />
+                </td>
+                <td class="px-2 py-1">
+                  <input [(ngModel)]="customer.company" class="w-full p-1 border border-gray-300 rounded-lg" />
+                </td>
+                <td class="px-1 py-1" style="min-width: 30px; text-align: center;">
+                  <!-- "X" Button to Remove Customer -->
+                  <button (click)="removeCustomer(i)" class="text-red-500 hover:text-red-700 p-0 m-0">X</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+
+
+
+        <!-- Import Button -->
+        <div *ngIf="csvData.length > 0" class="flex justify-end mt-4">
+          <button (click)="importData()" class="p-2 bg-black text-white text-sm rounded hover:bg-gray-800">
+            Import
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Panel: Customer Info Modal -->
+  <div *ngIf="selectedCustomer" class="w-3/4 bg-white pl-6">
+    <div class="flex items-center justify-between mb-4">
+      <!-- Profile Image and Customer Info -->
+      <div class="flex items-center space-x-4">
+        <!-- Profile Image Upload -->
+        <div class="relative w-16 h-16 bg-gray-200 rounded-full flex justify-center items-center">
+          <!-- Display the profile image if it exists -->
+          <img *ngIf="selectedCustomer?.profileImage" [src]="selectedCustomer.profileImage" alt="Profile Image"
+            class="w-full h-full rounded-full object-cover" />
+
+          <!-- Display the customer's initials if no profile image -->
+          <span *ngIf="!selectedCustomer?.profileImage" class="text-xl font-semibold text-gray-700">
+            {{ getInitials(selectedCustomer?.name) }}
+          </span>
+
+          <!-- Profile Image Upload Button -->
+          <button
+            class="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-black text-white flex items-center justify-center"
+            (click)="uploadProfileImage()">
+            <span class="material-icons-outlined text-xs">add</span>
+          </button>
+
+        </div>
+
+        <!-- Customer Name and Address -->
+        <div>
+          <h2 class="text-2xl font-semibold text-gray-800">{{ selectedCustomer?.name }}</h2>
+          <p class="text-gray-600 text-sm">{{ selectedCustomer?.address }}</p>
+        </div>
+      </div>
+
+      <!-- Edit and Delete Buttons -->
+      <div class="flex space-x-2">
+        <button
+          class="text-gray-500 bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded text-sm flex items-center space-x-1"
+          (click)="editCustomer(selectedCustomer)">
+          <span class="material-icons-outlined text-sm">edit</span>
+        </button>
+        <button
+          class="text-gray-500 bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded text-sm flex items-center space-x-1"
+          (click)="deleteCustomer(selectedCustomer)">
+          <span class="material-icons-outlined text-sm">delete</span>
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="isDeleteModalOpen" class="popup-overlay">
+      <div class="popup-container w-1/3">
+        <h2 class="text-lg font-semibold">Confirm Deletion</h2>
+        <p class="text-sm text-gray-700">
+          Are you sure you want to delete <strong>{{ selectedCustomer.name }}</strong>?
+        </p>
+        <div class="flex justify-end space-x-4 mt-4">
+          <button class="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300 text-sm" (click)="cancelDelete()">
+            Cancel
+          </button>
+          <button class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 text-sm"
+            (click)="confirmDelete(selectedCustomer)">
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Tabs (About, Notes, Appointments, Activity, Book Appointment) -->
+    <div class="border-gray-300 mb-4">
+      <ul class="flex space-x-4">
+        <li>
+          <button class="text-sm" [ngClass]="{'text-black border-b-2 border-black': selectedTab === 'about'}"
+            (click)="selectTab('about')">
+            About
+          </button>
+        </li>
+        <li>
+          <button class="text-sm" [ngClass]="{'text-black border-b-2 border-black': selectedTab === 'notes'}"
+            (click)="selectTab('notes')">
+            Notes
+          </button>
+        </li>
+        <li>
+          <button class="text-sm" [ngClass]="{'text-black border-b-2 border-black': selectedTab === 'appointments'}"
+            (click)="selectTab('appointments')">
+            Appointments
+          </button>
+        </li>
+        <li>
+          <button class="text-sm" [ngClass]="{'text-black border-b-2 border-black': selectedTab === 'activity'}"
+            (click)="selectTab('activity')">
+            Activity
+          </button>
+        </li>
+        <li>
+          <button class="text-sm" [ngClass]="{'text-black border-b-2 border-black': selectedTab === 'bookAppointment'}"
+            (click)="selectTab('bookAppointment')">
+            Book Appointment
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <!-- About Tab Content -->
+    <div *ngIf="selectedTab === 'about'" class="mt-4">
+      <p class="text-gray-600 text-sm flex items-center my-1 mt-2">
+        <span class="material-symbols-outlined text-gray-500 text-sm mr-2">phone</span>
+        {{ selectedCustomer.primary_phone }}
+      </p>
+      <p class="text-gray-600 text-sm flex items-center my-1 mt-2">
+        <span class="material-symbols-outlined text-gray-500 text-sm mr-2">email</span>
+        {{ selectedCustomer.primary_email }}
+      </p>
+      <p class="text-gray-600 text-sm flex items-center my-1 mt-2">
+        <span class="material-symbols-outlined text-gray-500 text-sm mr-2">location_on</span>
+        {{ selectedCustomer.address }}
+      </p>
+      <p class="text-gray-600 text-sm flex items-center my-1 mt-2">
+        <span class="material-symbols-outlined text-gray-500 text-sm mr-2">business</span>
+        {{ selectedCustomer.company }}
+      </p>
+    </div>
+
+    <!-- Notes Tab Content (Long Textarea) -->
+    <div *ngIf="selectedTab === 'notes'" class="mt-4">
+      <h3 class="text-md font-semibold">Notes</h3>
+      <textarea class="w-full h-40 p-2 border rounded-lg mt-4"
+        placeholder="Enter notes...">{{ selectedCustomer.notes }}</textarea>
+    </div>
+
+    <!-- Appointments Tab Content -->
+    <div *ngIf="selectedTab === 'appointments'" class="mt-4">
+      <h3 class="text-md font-semibold">Appointments</h3>
+      <div *ngIf="selectedCustomer.appointments.length === 0" class="mt-4">
+        <p>No appointments</p>
+      </div>
+      <ul>
+        <li *ngFor="let appointment of selectedCustomer.appointments" class="mt-4">
+          <p>{{ appointment.date }} - {{ appointment.details }}</p>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Activity Tab Content -->
+    <div *ngIf="selectedTab === 'activity'" class="mt-4">
+      <h3 class="text-md font-semibold">Activity</h3>
+      <p class="mt-4">Recent activity will be shown here.</p>
+    </div>
+
+    <!-- Book Appointment Tab Content -->
+    <div *ngIf="selectedTab === 'bookAppointment'" class="mt-4">
+      <h3 class="text-md font-semibold">Book Appointment</h3>
+      <button class="bg-black text-white p-2  pl-4 pr-4 rounded-full mt-4" (click)="openAppointmentModal()">
+        Book Now
+      </button>
+    </div>
+
+    <div *ngIf="showAppointmentPopup"
+      class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
+      <div class="bg-white rounded-lg p-6 w-1/3">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-semibold">Appointment</h3>
+          <button (click)="closeAppointmentModal()" class="text-black text-xl">&times;</button>
+        </div>
+
+        <div class="mb-4">
+          <label for="category" class="block text-sm font-semibold">Category</label>
+          <div class="relative">
+            <!-- Custom Dropdown -->
+            <div class="inline-block w-full mt-2">
+              <div
+                class="flex justify-between items-center p-2 bg-white border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 focus:ring-2 focus:ring-blue-500"
+                (click)="toggleDropdown()">
+                <span>{{ selectedCategory || 'Select a service' }}</span>
+                <span class="material-icons-outlined text-sm">arrow_drop_down</span>
+              </div>
+              <!-- Dropdown Options -->
+              <div *ngIf="dropdownOpen"
+                class="absolute w-full bg-white border border-gray-300 rounded-lg shadow-lg mt-1 z-10">
+                <div class="p-2 cursor-pointer hover:bg-gray-50" (click)="selectCategory('Service')">Service</div>
+                <div class="p-2 cursor-pointer hover:bg-gray-50" (click)="selectCategory('Class')">Class</div>
+                <div class="p-2 cursor-pointer hover:bg-gray-50" (click)="selectCategory('Event')">Event</div>
+                <div class="p-2 cursor-pointer hover:bg-gray-50" (click)="selectCategory('Reminder')">Reminder</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Appointment Form -->
+        <form>
+          <div class="mb-4">
+            <label for="service" class="block text-sm font-semibold">Service</label>
+            <select id="service" class="w-full p-2 border border-gray-300 rounded-lg">
+              <option>Select a service</option>
+              <!-- Add services here -->
+            </select>
+          </div>
+
+          <div class="mb-4">
+            <label for="date" class="block text-sm font-semibold">Date & Time</label>
+            <input type="datetime-local" id="date" class="w-full p-2 border border-gray-300 rounded-lg mt-2" />
+          </div>
+
+          <div class="mb-4">
+            <label for="repeat" class="block text-sm font-semibold">Repeat</label>
+            <select id="repeat" class="w-full p-2 border border-gray-300 rounded-lg mt-2">
+              <option>Does not repeat</option>
+              <!-- Repeat options here -->
+            </select>
+          </div>
+
+          <div class="mb-4">
+            <label for="guests" class="block text-sm font-semibold">Add guest(s)</label>
+            <input type="text" id="guests" class="w-full p-2 border border-gray-300 rounded-lg mt-2"
+              placeholder="Guest names" />
+          </div>
+
+          <div class="mb-4">
+            <label for="notes" class="block text-sm font-semibold">Notes to provider and guest(s)</label>
+            <textarea id="notes" class="w-full p-2 border border-gray-300 rounded-lg mt-2"
+              placeholder="Enter any notes"></textarea>
+          </div>
+
+          <div class="flex justify-end">
+            <button type="submit" class="bg-blue-500 text-white p-2 rounded">Create</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

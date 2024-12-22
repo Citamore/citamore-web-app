@@ -1,0 +1,452 @@
+<div class="container mx-auto p-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <!-- Left Customization Panel -->
+    <div class="customization-panel space-y-6 overflow-y-auto max-h-screen">
+      <!-- Brand Details Section -->
+      <div class="section space-y-2">
+        <!-- Image Uploader: Visible when no cropped image is selected -->
+        <div *ngIf="!croppedImage" class="relative flex items-center justify-center w-full h-48 border-2 border-dashed border-gray-400 rounded-md cursor-pointer" (click)="openCropper()">
+          <input 
+            type="file" 
+            (change)="onFileChange($event)"
+            class="absolute inset-0 opacity-0 cursor-pointer" 
+            accept="image/*" 
+          />
+          <div class="flex flex-col items-center justify-center text-sm text-gray-700">
+            <span class="material-symbols-outlined">upload</span>
+            <span>Upload Cover Image</span>
+          </div>
+        </div>
+      
+        <!-- Cropped Image Preview: Visible when cropped image is selected -->
+        <div *ngIf="croppedImage" class="relative cursor-pointer" (click)="openCropper()">
+          <img [src]="croppedImage" alt="Brand Banner" class="w-full h-48 object-cover mt-4 rounded-md" />
+          <div>
+            <!-- Edit Button to Reopen Cropper -->
+            <button (click)="reCrop()" class="absolute bottom-2 right-2 bg-gray-700 text-white px-3 py-1 rounded-md text-sm">Edit</button>
+            <!-- Delete Button (optional) -->
+            <button class="absolute bottom-2 right-16 bg-red-600 text-white px-3 py-1 rounded-md text-sm">Delete</button>
+          </div>
+        </div>
+      
+        <!-- Image Cropper Modal: Triggered by click on uploader or cropped image -->
+        <div bsModal #logoModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="logoModalLabel" [attr.inert]="logoModal?.isShown ? null : true" aria-hidden="true">
+          <div *ngIf="showCropper" class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h4 class="modal-title">Crop Image</h4>
+              </div>
+              <div class="modal-body">
+                <image-cropper
+                  #imageCropper
+                  [imageChangedEvent]="imageChangedEvent"
+                  [maintainAspectRatio]="true"
+                  [aspectRatio]="16 / 9"
+                  [autoCrop]="false"
+                  [onlyScaleDown]="true"
+                  outputType="both"
+                  (imageCropped)="imageCropped($event)"
+                  (imageLoaded)="imageLoaded()"
+                  (cropperReady)="cropperReady()"
+                  (loadImageFailed)="loadImageFailed()">
+                </image-cropper>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-secondary" (click)="cancelCrop()">Cancel</button>
+                <button (click)="crop()" class="mt-2 bg-green-600 text-white px-4 py-2 rounded-md text-sm">Save Cropped Image</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <div class="section space-y-2 flex items-center space-x-4">
+        <!-- Image Uploader with round shape and "+" symbol -->
+        <div class="relative">
+          <div class="w-24 h-24 border-2 border-gray-400 border-dashed rounded-full flex items-center justify-center cursor-pointer">
+            <input 
+              type="file" 
+              (change)="onLogoUpload($event)" 
+              class="absolute inset-0 opacity-0 cursor-pointer" 
+              accept="image/*"
+            />
+            <span class="material-symbols-outlined">add</span> <!-- Material Icon like "+" -->
+          </div>
+          <!-- Display uploaded image -->
+          <img *ngIf="brandLogo" [src]="brandLogo" alt="Brand Logo" class="absolute inset-0 w-12 h-12 object-cover rounded-full" />
+        </div>
+      
+        <!-- Brand Logo Text -->
+        <label class="font-semibold text-sm">Brand Logo</label>
+      
+        <!-- Subtext explaining the Brand Logo -->
+        <p class="text-xs text-gray-500">
+          Upload your brand logo here. This logo will be displayed across your branding materials and site.
+        </p>
+      </div>
+      
+  
+      <div class="section space-y-2">
+        <label class="font-semibold text-sm">Business Name</label>
+        <input 
+          type="text" 
+          [(ngModel)]="businessName" 
+          class="input text-sm mt-2 py-1 px-2" 
+          placeholder="Enter your business name" 
+        />
+      </div>
+      
+  
+      <div class="section space-y-2" (click)="onContainerClick($event)">
+        <label class="font-semibold text-sm">Service Industry</label>
+      
+        <!-- Search Input -->
+        <input 
+          type="text" 
+          [(ngModel)]="searchQuery" 
+          (focus)="toggleIndustryDropdown(true)" 
+          (input)="filterIndustries()" 
+          (click)="$event.stopPropagation()"
+          placeholder="Search industries..." 
+          class="input text-sm border-gray-300 rounded-md w-full mb-2 p-2"
+        />
+      
+        <!-- Custom Dropdown -->
+        <div *ngIf="dropdownIndustryOpen" class="relative">
+          <div class="bg-white border border-gray-300 rounded-md max-h-48 overflow-y-auto">
+            <ul class="space-y-2">
+                <li 
+                *ngFor="let industry of industries"
+                class="cursor-pointer px-3 py-2 text-xs hover:bg-gray-200 flex items-center"
+                (click)="selectIndustry(industry)"
+              >
+                <!-- Tick mark icon aligned with the text -->
+                <span *ngIf="industry === serviceIndustry" class="material-symbols-outlined mr-2">
+                  check
+                </span>
+                
+                <!-- Industry name text -->
+                {{ industry }}
+              </li>
+              
+            </ul>
+          </div>
+          
+          <!-- "Not Found" Message -->
+          <div *ngIf="filteredIndustries().length === 0 && searchQuery" class="text-sm text-gray-500 mt-2 px-3">
+            Not found
+          </div>
+        </div>
+      </div>
+      
+      
+      
+      <div class="section space-y-2">
+        <label class="font-semibold text-sm">About</label>
+        <textarea [(ngModel)]="about" class="input text-sm" placeholder="Write a short description about your business"></textarea>
+      </div>
+      <div class="divider"></div>
+
+      <!-- Visuals Section -->
+      <div class="section space-y-2">
+        <label class="font-semibold text-sm">Brand Colors</label>
+        <div class="flex space-x-2">
+          <button 
+            *ngFor="let color of brandColors" 
+            [ngStyle]="{'background-color': color}" 
+            class="w-8 h-8 rounded-full cursor-pointer">
+          </button>
+        </div>
+      </div>
+      
+      <div class="section space-y-2">
+        <label class="font-semibold text-sm">Button Shape</label>
+        <div class="flex space-x-4">
+          <div 
+            *ngFor="let shape of ['pill', 'rounded', 'rectangle']" 
+            (click)="buttonShape = shape" 
+            [class.selected]="buttonShape === shape" 
+            class="w-1/3 h-16 border-2 border-gray-100 rounded-lg flex items-center justify-center cursor-pointer p-2">
+            <div [ngClass]="{'rounded-full': shape === 'pill', 'rounded': shape === 'rounded'}" class="w-8 h-8 bg-gray-200"></div>
+            <span class="ml-2 text-xs">{{ shape | titlecase }}</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="section space-y-2">
+        <label class="font-semibold text-sm">Theme</label>
+        <div class="flex space-x-4">
+          <div 
+            *ngFor="let themeOption of ['system', 'light', 'dark']" 
+            (click)="theme = themeOption" 
+            [class.selected]="theme === themeOption" 
+            class="w-1/3 h-16 border-2 border-gray-100 rounded-lg flex items-center justify-center cursor-pointer p-2">
+            <span class="material-symbols-outlined" [ngClass]="{'text-black': themeOption === 'system', 'text-yellow-500': themeOption === 'light', 'text-blue-600': themeOption === 'dark'}">
+              {{ themeOption === 'system' ? 'monitor' : (themeOption === 'light' ? 'wb_sunny' : 'nights_stay') }}
+            </span>
+            <span class="ml-2 text-xs">{{ themeOption | titlecase }}</span>
+          </div>
+        </div>
+      </div>
+          
+  
+      <div class="section space-y-2">
+        <label class="font-semibold text-sm">Gallery (Up to 10 Images)</label>
+        
+        <!-- Container for images and uploader, allowing wrap -->
+        <div class="flex flex-wrap space-x-2">
+          <!-- Show Uploaded Images Thumbnails -->
+          <div *ngIf="gallery.length > 0" class="flex flex-wrap space-x-2">
+            <div *ngFor="let img of gallery; let i = index" class="relative group mb-2">
+              <!-- Image thumbnail -->
+              <img [src]="img" alt="Gallery Image" class="w-16 h-16 object-cover rounded-md" />
+              
+              <!-- Delete Button: Visible only on hover -->
+              <button *ngIf="gallery.length > 0" (click)="deleteImage(i)" class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20 text-white text-xs rounded-full opacity-0 group-hover:opacity-100 group-hover:bg-opacity-20 transition-all">
+                <span class="material-symbols-outlined">delete</span>
+              </button>
+            </div>
+          </div>
+        
+          <!-- Show Upload Button if fewer than 10 images -->
+          <div *ngIf="gallery.length < 10" class="relative flex items-center justify-center bg-gray-200 w-16 h-16 border-2 border-dashed border-gray-400 rounded-md cursor-pointer mb-2" (click)="fileInput.click()">
+            <div class="flex items-center justify-center text-sm text-gray-700">
+              <span class="material-symbols-outlined">add</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- File input for uploading images, hidden by default -->
+        <input 
+          type="file" 
+          #fileInput
+          (change)="onGalleryUpload($event)" 
+          multiple 
+          class="hidden"
+          accept="image/*" 
+        />
+        
+        <!-- Max image count message if there are more than 10 images -->
+        <div *ngIf="gallery.length >= 10" class="text-sm text-gray-500 mt-2">
+          You have reached the maximum of 10 images.
+        </div>
+      </div>
+      
+
+      <div class="divider"></div>
+      
+      <!-- Contact Details Section -->
+      <div class="section space-y-2">
+        <label class="font-semibold text-sm">Primary Email</label>
+        <input type="email" [(ngModel)]="primaryEmail" class="input text-sm mt-2" placeholder="Enter email" />
+      </div>
+  
+      <!-- In your component HTML -->
+
+      <div class="section space-y-2">
+        <label class="font-semibold text-sm">Primary Phone</label>
+        <div class="flex items-center space-x-2">
+          <!-- Country Code Dropdown with Flag -->
+          <select [(ngModel)]="selectedCountryCode" class="text-sm">
+            <option *ngFor="let country of countryCodes" [value]="country.code">
+              <span>{{ country.flag }} {{ country.code }}</span>
+            </option>
+          </select>
+          
+          <!-- Phone Number Input -->
+          <input 
+            type="text" 
+            [(ngModel)]="primaryPhone" 
+            class="input text-sm mt-2" 
+            placeholder="Enter phone number" 
+          />
+        </div>
+      </div>
+      
+
+      <div class="divider"></div>
+  
+      <!-- Location Section -->
+      <div class="section space-y-2">
+        <label class="font-semibold text-sm">Address</label>
+        <input type="text" [(ngModel)]="address" class="input text-sm" placeholder="Enter address" />
+      </div>
+  
+      <div class="section space-y-2">
+        <label class="font-semibold text-sm">City</label>
+        <input type="text" [(ngModel)]="city" class="input text-sm" placeholder="Enter city" />
+      </div>
+  
+      <div class="section space-y-2">
+        <label class="font-semibold text-sm">Province</label>
+        <input type="text" [(ngModel)]="province" class="input text-sm" placeholder="Enter province" />
+      </div>
+  
+      <div class="section space-y-2">
+        <label class="font-semibold text-sm">Zip/Postal Code</label>
+        <input type="text" [(ngModel)]="zip" class="input text-sm" placeholder="Enter postal code" />
+      </div>
+  
+      <div class="section space-y-2">
+        <label class="font-semibold text-sm">Country</label>
+        <input type="text" [(ngModel)]="country" class="input text-sm" placeholder="Enter country" />
+      </div>
+  
+      <div class="section space-y-2">
+        <label class="font-semibold text-sm">Currency</label>
+        <input type="text" [(ngModel)]="currency" class="input text-sm" placeholder="Enter currency" />
+      </div>
+  
+      <div class="divider"></div>
+
+      <!-- Business Hours Section -->
+      <div class="section space-y-2">
+        <label class="font-semibold text-sm">Business Hours</label>
+      
+        <!-- Loop through the days and create the business hour settings -->
+        <div *ngFor="let day of daysOfWeek" class="flex items-center justify-between space-y-2">
+          <div class="flex items-center space-x-2">
+            <!-- Toggle Switch for Each Day -->
+            <label class="switch">
+              <input
+                type="checkbox"
+                [(ngModel)]="day.enabled"
+                (change)="toggleDay(day)"
+                class="hidden"
+              />
+              <span class="slider"></span>
+            </label>
+            <label class="text-sm">{{ day.day }}</label>
+      
+            <!-- Copy Monday's values to other days -->
+            <span
+            *ngIf="day.day === 'Monday'"
+            (click)="copyMondayValues()"
+            class="material-symbols-outlined text-xs cursor-pointer"
+            matTooltip="Copy values to all days"  
+            >
+            content_copy
+            </span>
+              
+          </div>
+      
+          <!-- Show Time Input (Start and End) only when Day is Enabled -->
+          <div *ngIf="day.enabled" class="flex items-center space-x-2">
+            <!-- Start Time Custom Dropdown -->
+            <div class="relative time-dropdown">
+              <input
+                type="text"
+                [(ngModel)]="day.start"
+                (focus)="toggleStartEndDropdown('start', true, day)"
+                placeholder="Start"
+                class="input text-xs w-24 bg-white border-gray-300"
+                style="width: 80px;"
+                (click)="$event.stopPropagation()"
+
+              />
+              <div
+                *ngIf="day.dropdownOpen.start"
+                class="absolute left-0 z-10 mt-1 w-24 bg-white border border-gray-300 rounded-md max-h-[300px] overflow-y-auto"
+                style="width: 80px;"
+              >
+                <ul class="text-xs">
+                  <li *ngFor="let time of timeIntervals" (click)="selectTime('start', time, day)" class="px-2 py-1 hover:bg-gray-100 cursor-pointer">
+                    {{ time }}
+                  </li>
+                </ul>
+              </div>
+            </div>
+      
+            <span class="mx-2">–</span>
+      
+            <!-- End Time Custom Dropdown -->
+            <div class="relative time-dropdown">
+              <!-- Input for End Time -->
+              <input
+                type="text"
+                [(ngModel)]="day.end"
+                (focus)="toggleStartEndDropdown('end', true, day)"
+                placeholder="End"
+                class="input text-xs bg-white border-gray-300"
+                style="width: 80px;"
+                (click)="$event.stopPropagation()"
+              />
+      
+              <!-- Dropdown for End Time -->
+              <div
+                *ngIf="day.dropdownOpen.end"
+                class="absolute left-0 z-10 mt-1 bg-white border border-gray-300 rounded-md max-h-[300px] overflow-y-auto"
+                style="width: 80px;"
+              >
+                <ul class="text-xs">
+                  <li *ngFor="let time of timeIntervals" (click)="selectTime('end', time, day)" class="px-2 py-1 hover:bg-gray-100 cursor-pointer">
+                    {{ time }}
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+      
+          <!-- Show 'Closed' text if Day is disabled -->
+          <div *ngIf="!day.enabled" class="text-sm text-gray-500">Closed</div>
+        </div>
+      </div>
+      
+      
+      
+      <!-- TimeZone Section -->
+      <div class="section space-y-2">
+        <label class="font-semibold text-sm">Time Zone</label>
+        <select [(ngModel)]="timezone" class="input text-sm">
+          <option value="Canada-Toronto">Canada - Toronto</option>
+        </select>
+      </div>
+  
+      <div class="divider"></div>
+      <!-- Your Links Section -->
+      <div class="section space-y-2">
+        <label class="font-semibold text-sm">Website</label>
+        <input type="url" [(ngModel)]="website" class="input text-sm" />
+      </div>
+  
+      <div class="section space-y-2">
+        <label class="font-semibold text-sm">Instagram</label>
+        <input type="url" [(ngModel)]="instagram" class="input text-sm" />
+      </div>
+  
+      <div class="section space-y-2">
+        <label class="font-semibold text-sm">Facebook</label>
+        <input type="url" [(ngModel)]="facebook" class="input text-sm" />
+      </div>
+  
+      <div class="section space-y-2">
+        <label class="font-semibold text-sm">Twitter (X)</label>
+        <input type="url" [(ngModel)]="twitter" class="input text-sm" />
+      </div>
+    </div>
+  
+    <!-- Right Preview Section -->
+    <div class="preview-section space-y-6">
+        <!-- Toggle Between Mobile/Web View -->
+        <div class="flex justify-between items-center">
+            <button class="bg-gray-200 p-2 rounded" (click)="viewMode = 'web'">Web View</button>
+            <button class="bg-gray-200 p-2 rounded" (click)="viewMode = 'mobile'">Mobile View</button>
+        </div>
+
+        <!-- Live Preview of Business -->
+        <div class="preview-content p-4" [ngClass]="{'mobile-view': viewMode === 'mobile', 'web-view': viewMode === 'web'}">
+            <!-- Display the Banner Image -->
+            <!-- <img [src]="croppedImage" alt="Brand Banner" class="w-full h-48 object-cover mt-4 rounded-b-lg" /> -->
+            
+            <img src="assets/images/test.jpg" alt="Brand Banner" class="w-full h-48 object-cover mt-4 rounded-b-lg" />
+            <img *ngIf="brandLogo" [src]="brandLogo" alt="Brand Logo" class="w-16 h-16 object-cover rounded-full" />
+            <h1>{{ businessName }}</h1>
+            <p>{{ about }}</p>
+            
+            <!-- Display Gallery Images -->
+            <div *ngFor="let img of gallery">
+                <img [src]="img" alt="Gallery Image" class="w-20 h-20 object-cover rounded-md" />
+            </div>
+        </div>
+    </div>
+</div>
+  

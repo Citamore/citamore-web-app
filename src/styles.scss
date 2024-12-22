@@ -1,1 +1,94 @@
 /* You can add global styles to this file, and also import other style files */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import 'swiper/swiper-bundle.css';
+
+
+.custom-snackbar {
+    background-color: black !important;  // Black background
+    color: white !important;  // White text
+    border-radius: 12px !important;  // Rounded corners
+    font-size: 14px;  // Optional: Adjust font size if needed
+    padding: 10px;  // Optional: Add some padding for better spacing
+}
+
+/* Custom Tooltip Styling for MDC Tooltips */
+.mdc-tooltip__surface {
+  color: #fff !important;           /* Set text color to white */
+  background-color: #000 !important; /* Set background color to black */
+  font-size: 8px !important;         /* Reduce text size */
+  padding: 4px 8px !important;       /* Adjust padding for a smaller tooltip */
+  border-radius: 4px !important;     /* Optional: rounded corners */
+}
+
+.mdc-tooltip__arrow {
+  border-top-color: #000 !important; /* Arrow color to match the tooltip */
+  border-bottom-color: transparent !important; /* Remove the bottom border */
+  width: 6px !important;             /* Reduce the width of the arrow */
+  height: 6px !important;            /* Reduce the height of the arrow */
+}
+
+.divider {
+  height: 1px;
+  background-color: #e0e0e0; /* Light gray color */
+  margin: 20px 0; /* Adds spacing above and below the divider */
+}
+
+
+/* Style the toggle switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 34px;
+  height: 20px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 50px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 12px;
+  width: 12px;
+  border-radius: 50px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.4s;
+}
+
+input:checked + .slider {
+  background-color: #000;
+}
+
+input:checked + .slider:before {
+  transform: translateX(14px);
+}
+
+/* Mobile and Web View Styles */
+.mobile-view {
+  max-width: 375px; /* Mobile max width */
+  margin: 0 auto;
+}
+
+.web-view {
+  max-width: 1024px; /* Web max width */
+  margin: 0 auto;
+}

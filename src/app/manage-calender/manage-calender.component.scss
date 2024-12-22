@@ -1,0 +1,400 @@
+
+:host ::ng-deep .fc .fc-col-header-cell,
+:host ::ng-deep .fc .fc-daygrid-day{
+  border: 1px solid var(--fc-border-color); /* Remove borders */
+}
+:host ::ng-deep .fc-timegrid-divider {
+    display: none !important; /* Completely removes the divider */
+  }
+
+/* Adjust calendar font sizes */
+:host ::ng-deep .fc {
+  font-size: 12px; /* Make text smaller globally */
+  border: none; /* Removes the outer border */
+  box-shadow: none; /* Removes any shadow if present */
+  padding: 30px;
+}
+
+/* Smaller event text */
+:host ::ng-deep .fc-event-title {
+  font-size: 10px;
+  font-weight: 500; /* Optional: lighter font weight */
+}
+
+/* Smaller header text */
+:host ::ng-deep .fc-toolbar-title {
+  font-size: 14px;
+  font-weight: bold; /* Keep the title bold */
+}
+
+/* Smaller time labels on the left */
+:host ::ng-deep .fc-timegrid-axis {
+  font-size: 10px;
+}
+
+/* Adjust padding for a compact look */
+:host ::ng-deep .fc .fc-daygrid-day-frame,
+:host ::ng-deep .fc .fc-timegrid-slot {
+  padding: 2px;
+}
+
+:host ::ng-deep .fc-theme-standard .fc-scrollgrid {
+  border: none !important; /* Remove the border */
+}
+
+// :host ::ng-deep .fc-theme-standard td, .fc-theme-standard th {
+//    border: none !important; /* Remove the border */
+// }
+
+// :host ::ng-deep .fc-theme-standard td,
+// :host ::ng-deep .fc-theme-standard th {
+//   border: none !important; /* Removes borders for table cells and headers */
+// }
+
+/* Remove the border between minor slots (e.g., 6:00-6:30 and 6:30-7:00) */
+:host ::ng-deep .fc-timegrid-slot-minor {
+    border-top: none !important; /* Remove the top border */
+  }
+  
+  /* Keep all other borders intact */
+  :host ::ng-deep .fc-timegrid-slot-major {
+    border-bottom: 1px solid var(--fc-border-color); /* Ensure major slots retain their bottom border */
+  }
+
+/* Add a right border to the time column */
+:host ::ng-deep .fc-timegrid-axis {
+  border-right: 1px solid var(--fc-border-color); /* Adds the right-side border */
+}
+
+ /* Style the time-stamp container for proper alignment */
+:host ::ng-deep .time-stamp {
+    display: flex; /* Align elements in a row */
+    align-items: center; /* Vertically align items */
+    justify-content: center; /* Horizontally center content */
+    gap: 4px; /* Add spacing between elements */
+    font-size: 12px; /* Adjust font size */
+    font-weight: 600;
+    color: #333; /* Text color */
+    padding: 4px; /* Add padding for better spacing */
+  }
+
+//   :host ::ng-deep .slot-hover {
+//     border: none !important; /* Removes the border */
+//   }
+  
+  /* Style individual elements inside the time-stamp */
+  :host ::ng-deep .hour-wrapper,
+  :host ::ng-deep .minute-wrapper,
+  :host ::ng-deep .meridiem-wrapper,
+  :host ::ng-deep .separator-wrapper {
+    display: inline-block; /* Keep elements inline */
+  }
+  
+  /* Ensure the time slot container has proper padding and alignment */
+  :host ::ng-deep .fc-timegrid-slot-lane {
+    position: relative; /* Ensure child elements are positioned relative to this container */
+    padding: 0; /* Reset any unnecessary padding */
+    overflow: hidden; /* Prevent content overflow */
+  }
+  
+  :host ::ng-deep .slot-hover {
+    position: absolute;
+    z-index: 10;
+    height: 100%;
+    // display: none; /* Initially hidden */
+    border: 1px solid transparent; /* Hidden border */
+    transition: border-color 0.3s ease-in-out; /* Smooth border transition */
+  }
+  
+  :host ::ng-deep .fc-timegrid-slot-lane:hover .slot-hover {
+    opacity: 1; /* Make hover effect visible */
+    z-index: 10; /* Ensure hover content stays on top */
+  }
+
+  :host ::ng-deep .fc .fc-timegrid-slot {
+    height: 2.5em;
+}
+
+:host ::ng-deep .fc-button-group .fc-button {
+    background-color: transparent !important; /* Make the button background transparent */
+    border: none !important; /* Remove border */
+    box-shadow: none !important; /* Remove any shadow */
+    color: black !important; /* Ensure icon color is black */
+  }
+  
+  :host ::ng-deep .fc-button-group .fc-button:hover {
+    background-color: lightgrey !important; /* Keep background transparent on hover */
+  }
+  
+  :host ::ng-deep .fc-button-group .fc-icon {
+    color: black !important; /* Set icon color to black */
+    font-size: 1.2rem; /* Optional: Adjust icon size */
+  }
+  
+  :host ::ng-deep .fc-button-group .fc-icon:hover {
+    color: black !important; /* Keep icon black on hover */
+  }
+
+  :host ::ng-deep .fc-today-button {
+    border: 1px solid grey !important; /* Grey border */
+    border-radius: 20px !important; /* Rounded sides */
+    background-color: transparent !important; /* Transparent background */
+    color: black !important; /* Black text */
+    padding: 5px 15px; /* Optional: Adjust padding for better spacing */
+    transition: background-color 0.3s ease, border-color 0.3s ease; /* Smooth transition */
+  }
+  
+  :host ::ng-deep .fc-today-button:hover {
+    background-color: lightgrey !important; /* Light grey background on hover */
+    border-color: darkgrey !important; /* Darker grey border on hover */
+  }
+
+  :host ::ng-deep .fc-toolbar-title {
+    font-size: 14px !important; /* Set font size to 14px */
+    font-weight: 400 !important; /* Set font weight to 400 (normal) */
+  }
+  
+  :host ::ng-deep .fc-button-group .fc-button {
+    border: none !important; /* Remove default borders */
+    background-color: transparent !important; /* Transparent background */
+    color: black !important; /* Black text */
+    text-transform: capitalize; /* Capitalize the first word */
+    padding: 5px 10px; /* Adjust padding for better spacing */
+  }
+  
+  :host ::ng-deep .fc-button-group .fc-button + .fc-button {
+    margin-left: 5px; /* Optional: Space between buttons and divider */
+  }
+  
+  :host ::ng-deep .fc-button-group .fc-button-active {
+    background-color: lightgrey !important; /* Highlight active button */
+    font-weight: 500 !important; /* Bold text for active button */
+  }
+  
+  :host ::ng-deep .fc-button-group .fc-button:hover {
+    background-color: lightgrey !important; /* Light grey hover effect */
+  }
+
+  :host ::ng-deep .fc-col-header-cell-cushion {
+    font-size: 12px !important; /* Ensure font size is 12px */
+    font-weight: 500 !important; /* Apply font weight of 500 */
+  }
+  
+  :host ::ng-deep .fc-day-today {
+    background-color: lightgrey !important; /* Set background to light grey */
+    color: black !important; /* Optional: Ensure text is readable */
+  }
+  
+  :host ::ng-deep .fc-day-today .fc-daygrid-day-frame {
+    border-radius: 4px; /* Optional: Add rounded corners */
+  }
+  
+  :host ::ng-deep .fc-day-today:hover {
+    background-color: darkgrey !important; /* Optional: Darker grey on hover */
+  }
+  
+  :host ::ng-deep .fc-list-day {
+    border: none !important; /* Remove all borders */
+    background: none !important; /* Remove background color */
+  }
+  
+  :host ::ng-deep .fc-list-day .fc-list-day-cushion {
+    font-size: 14px !important; /* Set font size */
+    background: none !important; /* Remove background if applied here */
+    padding: 0; /* Optional: Adjust padding for a cleaner look */
+  }
+  
+  :host ::ng-deep .fc-list-day .fc-list-day-text,
+  :host ::ng-deep .fc-list-day .fc-list-day-side-text {
+    font-size: 14px !important; /* Ensure consistent font size */
+    color: inherit; /* Maintain text color */
+    text-align: left; /* Optional: Align text left for readability */
+  }
+
+  :host ::ng-deep .fc-list-table {
+    border: none !important; /* Remove border from the table */
+  }
+  
+
+  :host ::ng-deep .fc-theme-standard .fc-list {
+    border: none !important; /* Remove all borders */
+  }
+  
+  :host ::ng-deep .fc-theme-standard .fc-list th,
+  :host ::ng-deep .fc-theme-standard .fc-list td {
+    border: none !important; /* Remove borders from headers and cells */
+  }
+  
+  :host ::ng-deep .fc-theme-standard .fc-list tbody tr {
+    border: none !important; /* Remove borders around rows */
+  }
+  
+  .popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .popup-container {
+    background: #fff;
+    border-radius: 8px;
+    width: 30%;
+    // height: 50%;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .popup-info-item {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+  }
+  
+  .popup-label {
+    display: block;
+    color: #555;
+    opacity: 70%;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    width: 100%;
+    padding: 0px 6px;
+    margin: 0;
+    /* border: 1px solid #ddd; */
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  
+  .popup-label.hover-effect:hover {
+    // color: #007bff;
+    // text-decoration: underline;
+  }
+  
+  .popup-input {
+    width: 100%;
+    padding: 6px;
+    margin: 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  
+  .popup-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  
+    .popup-create-btn {
+      background-color: #000;
+      color: #fff;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  
+    .popup-cancel-btn {
+      background: transparent;
+      color: #000;
+      border: 1px solid #ddd;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  }
+
+  .calendar-input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    font-size: 14px;
+  
+    &:hover {
+      border-color: #007bff;
+    }
+  }
+  
+  /* Wrapper for relative positioning */
+.relative {
+    position: relative;
+  }
+  
+  /* Dropdown calendar styles */
+  .dropdown-calendar {
+    position: absolute;
+    top: 100%; /* Drop below the parent element */
+    left: 0;
+    z-index: 999; /* Ensure it appears above other elements */
+    background-color: white;
+    border: 1px solid #d1d5db; /* Subtle border */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 8px;
+    width: 350px;
+    box-sizing: border-box;
+  }
+  
+  /* Calendar popup input focus effect */
+  .calendar-popup:focus {
+    outline: none;
+  }
+  
+  .popup-label {
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  
+  .time-dropdown {
+    //padding: 4px 8px;
+    //border: 1px solid #d1d5db;
+    // width: 80px;
+    border-radius: 4px;
+    background-color: #fff;
+    font-size: 14px;
+  }
+  
+  .time-dropdown:focus {
+    outline: none;
+   // border-color: #007bff;
+  }
+  
+  .dropdown-calendar {
+    min-width: 300px;
+    padding: 8px;
+  }
+  
+  .flex {
+    display: flex;
+    align-items: center;
+  }
+  
+  .justify-between {
+    justify-content: space-between;
+  }
+  
+  .disabled {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  .popup-header {
+    padding-bottom: 1rem; /* Add padding for spacing */
+    border-bottom: 1px solid #e5e7eb; /* Tailwind's gray-200 color */
+  }
+  
+  .popup-header h2 {
+    margin: 0; /* Remove default margin for h2 */
+  }
+  
+  .popup-header .material-symbols-outlined {
+    font-size: 24px; /* Adjust icon size */
+  }
